@@ -10,5 +10,7 @@ export const path = {
   MANAGECOURSE: "manage-course",
   ENROLMETHOD: "course/enrol-method",
   USERENROLED: "course/user-enroled",
-  ADDACTIVITY: "course/activity"
+  PRACTICEPAGE: "practice-page",
+  CREATEPRACTICE: "practice/create",
+  FOLDER: "folder/document",
 };

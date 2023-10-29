@@ -1,13 +1,38 @@
 import ClearIcon from "@mui/icons-material/Clear";
-import { Box, IconButton, InputLabel, Modal, TextField } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  InputLabel,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
+
 import { Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
-import { uploadDocument } from "../api/upload";
+import {
+  apiGetDocumentById,
+  apiUpdateDocumentById
+} from "../api/upload";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 900,
+  bgcolor: "background.paper",
+  border: "none",
+  boxShadow: 24,
+  p: 4,
+  maxHeight: "90vh",
+  overflowY: "auto",
+};
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -26,21 +51,8 @@ export function renameFile(originalFile, newName) {
   });
 }
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 900,
-  bgcolor: "background.paper",
-  border: "none",
-  boxShadow: 24,
-  p: 4,
-  maxHeight: "90vh",
-  overflowY: "auto",
-};
-
-const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
+const ModalEditDocument = ({ open, handleClose, documentId }) => {
+  const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   console.log("files: ", files);
   const [rejected, setRejected] = useState([]);
@@ -48,14 +60,7 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     console.log("acceptedFiles: ", acceptedFiles);
     if (acceptedFiles?.length) {
-      setFiles((previousFiles) => [
-        ...previousFiles,
-        // ...acceptedFiles.map((file) => ({
-        //   ...file,
-        //   preview: URL.createObjectURL(file),
-        // })),
-        ...acceptedFiles,
-      ]);
+      setFiles((previousFiles) => [...previousFiles, ...acceptedFiles]);
     }
 
     if (rejectedFiles?.length) {
@@ -65,7 +70,6 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/png": [], "application/pdf": [] },
-    // maxSize: 1000000,
     onDrop,
   });
 
@@ -89,9 +93,21 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
     setRejected((files) => files.filter(({ file }) => file.path !== path));
   };
 
+  const { cid } = useParams();
+  //handleRemoveCurrentFile
+
+  const handleRemoveCurrentFile = (file, values) => {
+    setInitialValues({
+      ...values,
+      files: initialValues.files?.filter((item) => item !== file),
+    });
+  };
+
+  // Handle edit document
   const onSubmit = async (values) => {
-    if (!files?.length) return;
+    // if (!files?.length) return;
     console.log("files: ", files);
+    console.log("values: ", values);
 
     try {
       const formData = new FormData();
@@ -100,19 +116,16 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
       });
 
       formData.append("title", values.title);
-      formData.append("class_id", classId);
-      formData.append("topic_id", topicId);
+      formData.append("newFiles", values.files);
 
-      const response = await uploadDocument(formData);
-      if (response.status === 201) {
+      const response = await apiUpdateDocumentById(documentId, formData);
+      console.log("response: ", response.status);
+      if (response.status === 200) {
+        handleClose();
         Swal.fire({
-          text: "Tải lên thành công!",
+          text: "Cập nhật thành công!",
           confirmButtonColor: "#ffae00",
         });
-
-        handleClose()
-        onClose()
-        
       }
     } catch (error) {
       Swal.fire({
@@ -123,11 +136,24 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
     }
   };
 
-  const initialValues = { title: "" };
+  const [initialValues, setInitialValues] = useState({ title: "" });
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Vui lòng nhập tiêu đề"),
   });
+
+  const getDocumentById = async (documentId) => {
+    try {
+      const response = await apiGetDocumentById(documentId);
+      setInitialValues(response?.data?.document);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
+  };
+
+  useEffect(() => {
+    getDocumentById(documentId);
+  }, [documentId]);
 
   return (
     <>
@@ -153,8 +179,17 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
                 <ClearIcon />
               </IconButton>
 
-              <div className="my-8 flex justify-center">
-                <h1 className="text-2xl font-bold">Thêm tài liệu học tập</h1>
+              {/* Nội dung của Modal */}
+              <div className="flex items-center justify-center mb-8">
+                <Typography
+                  variant="h5"
+                  component="h4"
+                  align="center"
+                  className="w-[70%]"
+                  sx={{ fontWeight: "bold" }}
+                >
+                  Chỉnh sửa tài liệu
+                </Typography>
               </div>
               <div>
                 <Formik
@@ -165,11 +200,19 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
                   onSubmit={onSubmit}
                   enableReinitialize
                 >
-                  {({ touched, handleSubmit, getFieldProps, errors }) => {
+                  {({
+                    values,
+                    touched,
+                    handleSubmit,
+                    handleChange,
+                    getFieldProps,
+                    errors,
+                  }) => {
                     return (
                       <form
                         onSubmit={handleSubmit}
                         encType="multipart/form-data"
+                        noValidate
                       >
                         <div className="">
                           <div className="flex justify-center items-center my-2">
@@ -178,10 +221,12 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
                               <TextField
                                 name="title"
                                 variant="outlined"
+                                onChange={handleChange}
                                 fullWidth
                                 {...getFieldProps("title")}
                                 error={touched.title && Boolean(errors.title)}
                                 helperText={touched.title && errors.title}
+                                value={values?.title}
                               />
                             </div>
                           </div>
@@ -231,8 +276,37 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
                               </button>
                             </div>
 
-                            {/* Accepted files */}
+                            {/* Current files */}
                             <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
+                              Current Files
+                            </h3>
+                            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
+                              {values?.files?.map((file) => (
+                                <li
+                                  key={file}
+                                  className="relative h-32 rounded-md shadow-lg"
+                                >
+                                  <img
+                                    src="/../src/assets/icons/pdf-icon.png"
+                                    alt="PDF Icon"
+                                    className="h-full w-full object-contain rounded-md"
+                                  />
+                                  <button
+                                    type="button"
+                                    className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
+                                    onClick={() =>
+                                      handleRemoveCurrentFile(file, values)
+                                    }
+                                  >
+                                    <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
+                                  </button>
+                                  <span>{file}</span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            {/* Accepted files */}
+                            <h3 className="title text-lg font-semibold text-neutral-600 mt-24 border-b pb-3">
                               Accepted Files
                             </h3>
                             <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
@@ -305,4 +379,4 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
   );
 };
 
-export default UploadDocument;
+export default ModalEditDocument;

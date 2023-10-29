@@ -1,10 +1,10 @@
-import { Button, Divider } from "@mui/material";
+import { Divider } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import ListCategory from "../components/ListCategory";
 import ListMyCourse from "../components/ListMyCourse";
 import RightNavigate from "../components/RightNavigate";
-import { Link } from "react-router-dom";
 import { path } from "../utils/path";
 
 const Home = () => {

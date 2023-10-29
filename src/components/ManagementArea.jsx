@@ -44,11 +44,6 @@ const data = [
       },
     ],
   },
-  {
-    label: "Khoa công nghệ thông tin",
-    path: "/cntt",
-    icon: ComputerIcon,
-  },
 ];
 
 const ManagementArea = () => {

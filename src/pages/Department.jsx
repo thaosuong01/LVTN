@@ -37,9 +37,10 @@ const Department = () => {
             <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
               Danh mục khoa
             </Typography>
-            {departments?.map((department, index) => (
-              <List key={index}>
+            <List>
+              {departments?.map((department, index) => (
                 <ListItem
+                  key={index}
                   className="flex items-center"
                   sx={{
                     "&:hover": {
@@ -74,8 +75,8 @@ const Department = () => {
                     </Typography>
                   </div>
                 </ListItem>
-              </List>
-            ))}
+              ))}
+            </List>
           </div>
           <div className="w-[20%]">
             <RightNavigate></RightNavigate>

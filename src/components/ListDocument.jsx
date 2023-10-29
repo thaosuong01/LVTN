@@ -9,37 +9,25 @@ import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { apiGetClassById } from "../api/class";
 import { apiDeleteTopic, apiGetTopicByClass } from "../api/topic";
-import ModalEditTopic from "./ModalEditTopic";
+import { apiDeleteDocumentById, apiGetDocByClassId } from "../api/upload";
+import { path } from "../utils/path";
 import ModalAdd from "./ModalAdd";
 import ModalAddTopic from "./ModalAddTopic";
-import { apiGetClassById } from "../api/class";
-import Swal from "sweetalert2";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 800,
-  bgcolor: "background.paper",
-  border: "none",
-  boxShadow: 24,
-  p: 4,
-};
+import ModalEditDocument from "./ModalEditDocument";
+import ModalEditTopic from "./ModalEditTopic";
 
 const ListDocument = () => {
   const { isEditMode: editMode } = useSelector((state) => state.course);
 
-  const [open, setOpen] = useState(false);
-  const [openModalAdd, setOpenModalAdd] = useState(false);
-  const [openAddTopic, setOpenAddTopic] = useState(false);
-
   const [topics, setTopics] = useState();
 
-  const [topicId, setTopicId] = useState("");
   const [classId, setClassId] = useState("");
 
+  const [topicId, setTopicId] = useState("");
+  const [open, setOpen] = useState(false);
   const handleOpen = (topicId) => {
     setOpen(true);
     setTopicId(topicId);
@@ -49,6 +37,7 @@ const ListDocument = () => {
     setOpen(false);
   };
 
+  const [openModalAdd, setOpenModalAdd] = useState(false);
   const handleCloseModalAdd = () => {
     setOpenModalAdd(false);
   };
@@ -59,12 +48,31 @@ const ListDocument = () => {
     setClassId(classId);
   };
 
+  const [openAddTopic, setOpenAddTopic] = useState(false);
   const handleCloseAddTopic = () => {
     setOpenAddTopic(false);
   };
 
-  const handleOpenAddTopic = (cid) => {
+  const handleOpenAddTopic = () => {
     setOpenAddTopic(true);
+  };
+
+  const onCloseModalAdd = () => {
+    setOpenModalAdd(false);
+    getDocumentsByClassId(cid);
+  };
+
+  const [docId, setDocId] = useState("");
+  const [openModalEditDocument, setOpenModalEditDocument] = useState(false);
+
+  const handleOpenModalEditDocument = (docId) => {
+    setOpenModalEditDocument(true);
+    setDocId(docId);
+  };
+
+  const handleCloseModalEditDocument = () => {
+    setOpenModalEditDocument(false);
+    getDocumentsByClassId(cid);
   };
 
   const { user } = useSelector((state) => state.user);
@@ -90,11 +98,23 @@ const ListDocument = () => {
     getTopic();
   }, [cid]);
 
-  const { types } = useSelector((state) => state.topic);
-  console.log(types);
+  const [documents, setDocuments] = useState([]);
+
+  const getDocumentsByClassId = async (cid) => {
+    try {
+      const response = await apiGetDocByClassId(cid);
+      setDocuments(response?.data.documents);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Gọi hàm getDocumentsByClassId với cid hiện tại
+    getDocumentsByClassId(cid);
+  }, [cid]);
 
   const handleDelete = (tid) => {
-    console.log(tid);
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -110,6 +130,30 @@ const ListDocument = () => {
           console.log(response);
           Swal.fire("Deleted!", "The topic has been deleted.", "success");
           getTopic();
+        } catch (error) {
+          Swal.fire("Fail!", "Delete fail", "error");
+        }
+      }
+    });
+  };
+
+  const handleDeleteDocument = (did) => {
+    console.log("did: ", did);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffae00",
+      cancelButtonColor: "#90c446",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await apiDeleteDocumentById(did);
+          console.log(response);
+          Swal.fire("Deleted!", "The document has been deleted.", "success");
+          getDocumentsByClassId(cid);
         } catch (error) {
           Swal.fire("Fail!", "Delete fail", "error");
         }
@@ -185,32 +229,77 @@ const ListDocument = () => {
                 ) : null}
               </div>
 
-              {topic?.documents?.map((doc, docIndex) => (
-                <List key={docIndex}>
-                  <ListItem disablePadding>
-                    <div className="flex justify-between w-full">
-                      <div className="flex gap-4 w-[80%]">
-                        {doc.type === "folder" && (
-                          <img src="/../src/assets/icons/document.svg" alt="" />
-                        )}
-                        {doc.type === "pdf" && (
-                          <img src="/../src/assets/icons/pdf.png" alt="" />
-                        )}
-                        <span>{doc.document}</span>
-                      </div>
-                    </div>
+              {documents?.map((doc) => {
+                if (doc?.topic_id === topic?._id)
+                  return (
+                    <List key={doc?._id}>
+                      <ListItem disablePadding>
+                        <div className="flex justify-between w-full">
+                          <div className="flex gap-4 w-[80%] items-center">
+                            {doc?.files?.length === 1 ? (
+                              <>
+                                {doc?.files[0].split(".").pop() === "pdf" ? (
+                                  <img
+                                    src="/../src/assets/icons/pdf-icon.png"
+                                    alt="PDF"
+                                    width={40}
+                                  />
+                                ) : (
+                                  <img
+                                    src="/../src/assets/icons/ppt.png"
+                                    alt="PPT"
+                                    width={40}
+                                  />
+                                )}
 
-                    <div className="flex justify-end items-center w-[20%] text-sm text-primary hover:text-hover cursor-pointer">
-                      <Checkbox />
-                      {editMode ? (
-                        <>
-                          <span>Chỉnh sửa</span>
-                        </>
-                      ) : null}
-                    </div>
-                  </ListItem>
-                </List>
-              ))}
+                                <Link
+                                  to={`${import.meta.env.VITE_SERVER_URL}/${
+                                    doc?.files[0]
+                                  }`}
+                                >
+                                  {doc?.title}
+                                </Link>
+                              </>
+                            ) : (
+                              <>
+                                <img
+                                  src="/../src/assets/icons/folder.png"
+                                  alt="Folder"
+                                  width={40}
+                                />
+                                <Link to={`/${path.FOLDER}/${doc?._id}`}>
+                                  {doc?.title}
+                                </Link>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end items-center w-[20%]  cursor-pointer">
+                          <Checkbox />
+                          {editMode ? (
+                            <div className="flex gap-2">
+                              <span
+                                className="text-sm text-primary hover:text-hover"
+                                onClick={() =>
+                                  handleOpenModalEditDocument(doc?._id)
+                                }
+                              >
+                                Chỉnh sửa
+                              </span>
+                              <span
+                                className="text-primary text-sm hover:text-hover"
+                                onClick={() => handleDeleteDocument(doc?._id)}
+                              >
+                                Xóa
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </ListItem>
+                    </List>
+                  );
+              })}
             </Fragment>
           ))}
         </div>
@@ -227,6 +316,7 @@ const ListDocument = () => {
       )}
       {openModalAdd && (
         <ModalAdd
+          onClose={onCloseModalAdd}
           handleClose={handleCloseModalAdd}
           classId={classId}
           topicId={topicId}
@@ -239,6 +329,13 @@ const ListDocument = () => {
           classId={cid}
           open={openAddTopic}
           setTopics={setTopics}
+        />
+      )}
+      {openModalEditDocument && (
+        <ModalEditDocument
+          handleClose={handleCloseModalEditDocument}
+          documentId={docId}
+          open={openModalEditDocument}
         />
       )}
     </>

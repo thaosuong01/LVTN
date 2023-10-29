@@ -3,11 +3,11 @@ import { Box, IconButton, InputLabel, Modal, TextField } from "@mui/material";
 import { Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useNavigate } from "react-router-dom";
-import slugify from "slugify";
+import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { uploadDocument } from "../api/upload";
+import slugify from "slugify";
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -40,7 +40,7 @@ const style = {
   overflowY: "auto",
 };
 
-const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
+const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
   const [files, setFiles] = useState([]);
   console.log("files: ", files);
   const [rejected, setRejected] = useState([]);
@@ -64,7 +64,11 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { "image/png": [], "application/pdf": [] },
+    accept: [
+      "application/pdf",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ],
     // maxSize: 1000000,
     onDrop,
   });
@@ -110,9 +114,8 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
           confirmButtonColor: "#ffae00",
         });
 
-        handleClose()
-        onClose()
-        
+        handleClose();
+        onClose();
       }
     } catch (error) {
       Swal.fire({
@@ -154,7 +157,7 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
               </IconButton>
 
               <div className="my-8 flex justify-center">
-                <h1 className="text-2xl font-bold">Thêm tài liệu học tập</h1>
+                <h1 className="text-2xl font-bold">Thêm bài giảng</h1>
               </div>
               <div>
                 <Formik
@@ -305,4 +308,4 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
   );
 };
 
-export default UploadDocument;
+export default UploadLecture;

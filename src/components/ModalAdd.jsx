@@ -1,9 +1,12 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 
-import { default as React, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { default as React } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { path } from "../utils/path";
+import UploadDocument from "./UploadDocument";
+import { useState } from "react";
+import UploadLecture from "./UploadLecture";
 
 const style = {
   position: "absolute",
@@ -17,17 +20,33 @@ const style = {
   p: 4,
 };
 
-const ModalAdd = ({ handleClose, topicId, classId, open }) => {
-  const navigate = useNavigate();
-  console.log(topicId);
+const ModalAdd = ({ handleClose, topicId, classId, open, onClose }) => {
+  // const handleNavigate = (selectedActivity) => {
+  //   if (selectedActivity === "folder") {
+  //     navigate(`/${path.ADDACTIVITY}/folder/${classId}/${topicId}`);
+  //   } else if (selectedActivity === "document") {
+  //     navigate(`/${path.ADDACTIVITY}/document/${classId}/${topicId}`);
+  //   }
+  // };
 
-  const handleNavigate = (selectedActivity) => {
-    if (selectedActivity === "folder") {
-      navigate(`/${path.ADDACTIVITY}/folder/${classId}/${topicId}`);
-    } else if (selectedActivity === "document") {
-      navigate(`/${path.ADDACTIVITY}/document/${classId}/${topicId}`);
-    }
+  const [openModalUploadDocument, setOpenModalUploadDocument] = useState(false);
+  const handleOpenModalUploadDocument = () => {
+    setOpenModalUploadDocument(true);
   };
+
+  const handleCloseModalUploadDocument = () => {
+    setOpenModalUploadDocument(false);
+  };
+
+  const [openModalUploadLecture, setOpenModalUploadLecture] = useState(false);
+  const handleOpenModalUploadLecture = () => {
+    setOpenModalUploadLecture(true);
+  };
+
+  const handleCloseModalUploadLecture = () => {
+    setOpenModalUploadLecture(false);
+  };
+
   return (
     <>
       <Modal
@@ -66,7 +85,7 @@ const ModalAdd = ({ handleClose, topicId, classId, open }) => {
               </div>
               <div className="flex gap-4 justify-center items-center">
                 <div
-                  onClick={() => handleNavigate("folder")}
+                  onClick={() => handleOpenModalUploadDocument()}
                   className="cursor-pointer hover:text-hover text-black flex flex-col items-center"
                 >
                   <img
@@ -77,7 +96,7 @@ const ModalAdd = ({ handleClose, topicId, classId, open }) => {
                   <span>Thư mục</span>
                 </div>
                 <div
-                  onClick={() => handleNavigate("lecture")}
+                  onClick={() => handleOpenModalUploadLecture()}
                   className="cursor-pointer hover:text-hover text-black flex flex-col items-center"
                 >
                   <img
@@ -88,7 +107,7 @@ const ModalAdd = ({ handleClose, topicId, classId, open }) => {
                   <span>Bài giảng</span>
                 </div>
                 <div
-                  onClick={() => handleNavigate("document")}
+                  onClick={() => handleOpenModalUploadDocument()}
                   className="cursor-pointer hover:text-hover text-black flex flex-col items-center"
                 >
                   <img
@@ -98,22 +117,40 @@ const ModalAdd = ({ handleClose, topicId, classId, open }) => {
                   />
                   <span>Tài liệu</span>
                 </div>
-                <div
-                  onClick={() => handleNavigate("practice")}
-                  className="cursor-pointer hover:text-hover text-black flex flex-col items-center"
-                >
-                  <img
-                    src="/../src/assets/icons/exercise.png"
-                    alt=""
-                    className="w-20"
-                  />
-                  <span>Bài tập</span>
-                </div>
+                <Link to={`/${path.CREATEPRACTICE}`}>
+                  <div className="cursor-pointer hover:text-hover text-black flex flex-col items-center">
+                    <img
+                      src="/../src/assets/icons/exercise.png"
+                      alt=""
+                      className="w-20"
+                    />
+                    <span>Bài tập</span>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
         </Box>
       </Modal>
+
+      {openModalUploadDocument && (
+        <UploadDocument
+          handleClose={handleCloseModalUploadDocument}
+          classId={classId}
+          topicId={topicId}
+          open={openModalUploadDocument}
+          onClose={onClose}
+        />
+      )}
+      {openModalUploadLecture && (
+        <UploadLecture
+          handleClose={handleCloseModalUploadLecture}
+          classId={classId}
+          topicId={topicId}
+          open={openModalUploadLecture}
+          onClose={onClose}
+        />
+      )}
     </>
   );
 };

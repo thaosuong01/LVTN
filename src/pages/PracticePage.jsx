@@ -2,7 +2,7 @@ import React from "react";
 import RightNavigate from "../components/RightNavigate";
 import UploadDocument from "../components/UploadDocument";
 
-const AddActivity = () => {
+const PracticePage = () => {
   return (
     <>
       <div className="bg-white py-8">
@@ -19,4 +19,4 @@ const AddActivity = () => {
   );
 };
 
-export default AddActivity;
+export default PracticePage;

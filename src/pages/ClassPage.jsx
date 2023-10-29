@@ -14,15 +14,12 @@ const ClassPage = () => {
   const dispatch = useDispatch();
 
   const { isEditMode } = useSelector((state) => state.course);
-  console.log(isEditMode);
 
   const handleToggleEditingMode = () => {
     dispatch(toggleEditMode());
   };
 
   const { user } = useSelector((state) => state.user);
-
-  console.log(user?._id);
 
   const { cid } = useParams();
 
@@ -35,8 +32,6 @@ const ClassPage = () => {
 
     getClass();
   }, [cid]);
-
-  console.log(classes?.owner);
 
   return (
     <>

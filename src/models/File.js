@@ -3,17 +3,14 @@ const { Schema } = mongoose;
 
 const fileSchema = new Schema(
   {
-    document_id: {
-      type: Schema.Types.ObjectId,
-      ref: "Document",
+    file_name: {
+      type: String,
       required: true,
     },
-    file_name: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+
+    path: {
+      type: String,
+    },
   },
   { timestamps: true, versionKey: false }
 );

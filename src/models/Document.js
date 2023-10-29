@@ -17,6 +17,11 @@ const documentSchema = new Schema(
       type: String,
       required: true,
     },
+    files: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true, versionKey: false }
 );

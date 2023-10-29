@@ -9,14 +9,21 @@ import authRoute from "./routes/authRoute.js";
 import classRoute from "./routes/classRoute.js";
 import courseRoute from "./routes/courseRoute.js";
 import departmentRoute from "./routes/departmentRoute.js";
-import uploadRoute from "./routes/uploadRoute.js";
+import uploadRoute, { fSlug } from "./routes/uploadRoute.js";
 import roleRoute from "./routes/roleRoute.js";
 import topicRoute from "./routes/topicRoute.js";
 import userRoute from "./routes/userRoute.js";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 
 const app = express();
+
+app.use(express.static(path.join(__dirname, "uploads")));
 
 app.use(
   cors({
@@ -46,7 +53,7 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-  console.log("error: ", error);
+  // console.log("error: ", error.message);
   const message = error.message || "Error Server!";
   const statusCode = error.statusCode || 500;
   res.status(statusCode).json({

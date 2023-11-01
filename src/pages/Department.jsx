@@ -1,12 +1,10 @@
 import { List, ListItem, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { apiGetClass } from "../api/class";
 import RightNavigate from "../components/RightNavigate";
 import { path } from "../utils/path";
-import { useSelector } from "react-redux";
-import { apiGetClass } from "../api/class";
-import { useState } from "react";
-import { useEffect } from "react";
 
 const Department = () => {
   const { departments } = useSelector((state) => state.department);

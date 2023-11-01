@@ -11,6 +11,10 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { apiGetClassById } from "../api/class";
+import {
+  apiDeleteExerciseById,
+  apiGetExerciseByClassId,
+} from "../api/exercise";
 import { apiDeleteTopic, apiGetTopicByClass } from "../api/topic";
 import { apiDeleteDocumentById, apiGetDocByClassId } from "../api/upload";
 import { path } from "../utils/path";
@@ -114,6 +118,22 @@ const ListDocument = () => {
     getDocumentsByClassId(cid);
   }, [cid]);
 
+  const [exercises, setExercises] = useState([]);
+
+  const getExercisesByClassId = async (cid) => {
+    try {
+      const response = await apiGetExerciseByClassId(cid);
+      setExercises(response?.data);
+    } catch (error) {
+      console.error("Error fetching exercises:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Gọi hàm getDocumentsByClassId với cid hiện tại
+    getExercisesByClassId(cid);
+  }, [cid]);
+
   const handleDelete = (tid) => {
     Swal.fire({
       title: "Are you sure?",
@@ -154,6 +174,30 @@ const ListDocument = () => {
           console.log(response);
           Swal.fire("Deleted!", "The document has been deleted.", "success");
           getDocumentsByClassId(cid);
+        } catch (error) {
+          Swal.fire("Fail!", "Delete fail", "error");
+        }
+      }
+    });
+  };
+
+  const handleDeleteExercise = (eid) => {
+    console.log("eid: ", eid);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffae00",
+      cancelButtonColor: "#90c446",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await apiDeleteExerciseById(eid);
+          console.log(response);
+          Swal.fire("Deleted!", "The exercise has been deleted.", "success");
+          getExercisesByClassId(cid);
         } catch (error) {
           Swal.fire("Fail!", "Delete fail", "error");
         }
@@ -299,6 +343,49 @@ const ListDocument = () => {
                       </ListItem>
                     </List>
                   );
+              })}
+
+              {exercises.map((ex) => {
+                if (ex.topic_id === topic?._id) {
+                  return (
+                    <List key={ex._id}>
+                      <ListItem disablePadding>
+                        <div className="flex justify-between w-full">
+                          <div className="flex gap-4 w-[80%] items-center">
+                            <img
+                              src="/../src/assets/icons/practice.png"
+                              alt="Folder"
+                              width={40}
+                            />
+                            <Link to={`/${path.PRACTICEPAGE}/${ex._id}`}>
+                              {ex.title}
+                            </Link>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end items-center w-[20%]  cursor-pointer">
+                          <Checkbox />
+                          {editMode ? (
+                            <div className="flex gap-2">
+                              <Link
+                                to={`/${path.UPDATEPRACTICE}/${ex?._id}`}
+                                className="text-sm text-primary hover:text-hover"
+                              >
+                                Chỉnh sửa
+                              </Link>
+                              <span
+                                className="text-primary text-sm hover:text-hover"
+                                onClick={() => handleDeleteExercise(ex._id)}
+                              >
+                                Xóa
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </ListItem>
+                    </List>
+                  );
+                }
               })}
             </Fragment>
           ))}

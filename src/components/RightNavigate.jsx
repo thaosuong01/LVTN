@@ -58,8 +58,8 @@ const RightNavigate = () => {
               data={[
                 {
                   label: "All Courses",
-                  path: "/",
-                  children: departments, // Sử dụng flat() để làm phẳng mảng con
+                  pathData: "/",
+                  children: departments,
                 },
               ]}
             />

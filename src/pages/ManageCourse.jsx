@@ -4,6 +4,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { List, ListItem, Pagination, Stack, Typography } from "@mui/material";
 import React, { Fragment, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { apiGetClass, apiUpdateClass, deleteClass } from "../api/class";
@@ -12,7 +13,6 @@ import { apiGetDepartmentByID } from "../api/department";
 import ModalEditCourse from "../components/ModalEditCourse";
 import RightNavigate from "../components/RightNavigate";
 import { path } from "../utils/path";
-import { useSelector } from "react-redux";
 
 const ManageCourse = () => {
   const { user } = useSelector((state) => state.user);

@@ -1,28 +1,16 @@
 import ClearIcon from "@mui/icons-material/Clear";
-import {
-  Box,
-  IconButton,
-  InputLabel,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Modal, Typography } from "@mui/material";
 
 import { Formik } from "formik";
-import React, { useCallback, useEffect, useState } from "react";
+import { default as React, useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useNavigate, useParams } from "react-router-dom";
-import slugify from "slugify";
-import Swal from "sweetalert2";
-import * as Yup from "yup";
-import { apiGetDocumentById, apiUpdateDocumentById } from "../api/upload";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 900,
+  width: 800,
   bgcolor: "background.paper",
   border: "none",
   boxShadow: 24,
@@ -31,28 +19,8 @@ const style = {
   overflowY: "auto",
 };
 
-export const fSlug = (text) =>
-  slugify(text, {
-    replacement: "-", // replace spaces with replacement character, defaults to `-`
-    remove: undefined, // remove characters that match regex, defaults to `undefined`
-    lower: true, // convert to lower case, defaults to `false`
-    strict: false, // strip special characters except replacement, defaults to `false`
-    locale: "vi", // language code of the locale to use
-    trim: true, // trim leading and trailing replacement chars, defaults to `true`
-  });
-
-export function renameFile(originalFile, newName) {
-  return new File([originalFile], newName, {
-    type: originalFile.type,
-    lastModified: originalFile.lastModified,
-  });
-}
-
-const ModalEditDocument = ({ open, handleClose, documentId }) => {
-  const navigate = useNavigate();
+const ModalSubmitExercise = ({ handleClose, open }) => {
   const [files, setFiles] = useState([]);
-  console.log("files: ", files);
-  const [rejected, setRejected] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     console.log("acceptedFiles: ", acceptedFiles);
@@ -66,11 +34,8 @@ const ModalEditDocument = ({ open, handleClose, documentId }) => {
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: [
-      "application/pdf",
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    ],
+    accept: { "image/png": [], "application/pdf": [] },
+    // maxSize: 1000000,
     onDrop,
   });
 
@@ -87,75 +52,8 @@ const ModalEditDocument = ({ open, handleClose, documentId }) => {
 
   const removeAll = () => {
     setFiles([]);
-    setRejected([]);
   };
-
-  const removeRejected = (path) => {
-    setRejected((files) => files.filter(({ file }) => file.path !== path));
-  };
-
-  const { cid } = useParams();
-  //handleRemoveCurrentFile
-
-  const handleRemoveCurrentFile = (file, values) => {
-    setInitialValues({
-      ...values,
-      files: initialValues.files?.filter((item) => item !== file),
-    });
-  };
-
-  // Handle edit document
-  const onSubmit = async (values) => {
-    // if (!files?.length) return;
-    console.log("files: ", files);
-    console.log("values: ", values);
-
-    try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append("files", renameFile(file, fSlug(file.name)));
-      });
-
-      formData.append("title", values.title);
-      formData.append("newFiles", values.files);
-
-      const response = await apiUpdateDocumentById(documentId, formData);
-      console.log("response: ", response.status);
-      if (response.status === 200) {
-        handleClose();
-        Swal.fire({
-          text: "Cập nhật thành công!",
-          confirmButtonColor: "#ffae00",
-        });
-      }
-    } catch (error) {
-      Swal.fire({
-        text: error?.response?.data?.message ?? error?.message,
-        confirmButtonColor: "#ffae00",
-      });
-      console.log(error);
-    }
-  };
-
-  const [initialValues, setInitialValues] = useState({ title: "" });
-
-  const validationSchema = Yup.object().shape({
-    title: Yup.string().required("Vui lòng nhập tiêu đề"),
-  });
-
-  const getDocumentById = async (documentId) => {
-    try {
-      const response = await apiGetDocumentById(documentId);
-      setInitialValues(response?.data?.document);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-    }
-  };
-
-  useEffect(() => {
-    getDocumentById(documentId);
-  }, [documentId]);
-
+  const onSubmit = async () => {};
   return (
     <>
       <Modal
@@ -189,51 +87,31 @@ const ModalEditDocument = ({ open, handleClose, documentId }) => {
                   className="w-[70%]"
                   sx={{ fontWeight: "bold" }}
                 >
-                  Chỉnh sửa tài liệu hoặc bài giảng
+                  Tải lên kết quả
                 </Typography>
               </div>
               <div>
                 <Formik
-                  initialValues={initialValues}
-                  validationSchema={validationSchema}
                   validateOnBlur={false}
                   validateOnChange={false}
                   onSubmit={onSubmit}
                   enableReinitialize
                 >
                   {({
-                    values,
                     touched,
                     handleSubmit,
-                    handleChange,
                     getFieldProps,
                     errors,
+                    values,
+                    handleChange,
+                    setFieldValue,
                   }) => {
                     return (
                       <form
                         onSubmit={handleSubmit}
                         encType="multipart/form-data"
-                        noValidate
                       >
-                        <div className="">
-                          <div className="flex justify-center items-center my-2">
-                            <InputLabel className="w-[30%]">Tiêu đề</InputLabel>
-                            <div className="w-[70%]">
-                              <TextField
-                                name="title"
-                                variant="outlined"
-                                onChange={handleChange}
-                                fullWidth
-                                {...getFieldProps("title")}
-                                error={touched.title && Boolean(errors.title)}
-                                helperText={touched.title && errors.title}
-                                value={values?.title}
-                              />
-                            </div>
-                          </div>
-                        </div>
                         <div>
-                          <InputLabel>Files</InputLabel>
                           <div
                             className="p-16 mt-2 border border-neutral-200 cursor-pointer"
                             {...getRootProps({})}
@@ -277,42 +155,13 @@ const ModalEditDocument = ({ open, handleClose, documentId }) => {
                               </button>
                             </div>
 
-                            {/* Current files */}
-                            <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
-                              Current Files
-                            </h3>
-                            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
-                              {values?.files?.map((file) => (
-                                <li
-                                  key={file}
-                                  className="relative h-32 rounded-md shadow-lg"
-                                >
-                                  <img
-                                    src="/../src/assets/icons/pdf-icon.png"
-                                    alt="PDF Icon"
-                                    className="h-full w-full object-contain rounded-md"
-                                  />
-                                  <button
-                                    type="button"
-                                    className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
-                                    onClick={() =>
-                                      handleRemoveCurrentFile(file, values)
-                                    }
-                                  >
-                                    <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
-                                  </button>
-                                  <span>{file}</span>
-                                </li>
-                              ))}
-                            </ul>
-
                             {/* Accepted files */}
                             {files?.length > 0 && (
                               <div>
-                                <h3 className="title text-lg font-semibold text-neutral-600 mt-24 border-b pb-3">
+                                <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
                                   Accepted Files
                                 </h3>
-                                <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
+                                <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10 mb-5">
                                   {files.map((file) => (
                                     <li
                                       key={file.path}
@@ -351,4 +200,4 @@ const ModalEditDocument = ({ open, handleClose, documentId }) => {
   );
 };
 
-export default ModalEditDocument;
+export default ModalSubmitExercise;

@@ -6,8 +6,9 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { path } from "../utils/path.js";
 
-const NavigationItem = ({ label, path, children = [] }) => {
+const NavigationItem = ({ label, pathData, children = [] }) => {
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
@@ -19,7 +20,7 @@ const NavigationItem = ({ label, path, children = [] }) => {
       <ListItemButton
         className=""
         component={children?.length ? "div" : Link}
-        {...(children?.length ? {} : { to: path })}
+        {...(children?.length ? {} : { to: pathData })}
         onClick={children?.length ? handleClick : undefined}
         sx={{ padding: 0 }}
       >
@@ -31,25 +32,31 @@ const NavigationItem = ({ label, path, children = [] }) => {
           )
         ) : null}
 
-        <Typography variant="body1" sx={{ fontSize: "14px" }}>
+        <Link
+          to={`/${path.LISTCOURSE}/`}
+          variant="body1"
+          sx={{ fontSize: "14px" }}
+        >
           {label}
-        </Typography>
+        </Link>
       </ListItemButton>
 
       {children?.length ? (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {children.map((item, idx) => (
-              <ListItemButton
-                key={idx}
-                component={Link}
-                to={item.path}
-              >
-                <Typography variant="body1" sx={{ fontSize: "14px" }}>
-                  {item.department}
-                </Typography>
-              </ListItemButton>
-            ))}
+            {children.map((item, idx) => {
+              return (
+                <ListItemButton
+                  key={idx}
+                  component={Link}
+                  to={`/${path.LISTCOURSE}/${item?.department_id}`}
+                >
+                  <Typography variant="body1" sx={{ fontSize: "14px" }}>
+                    {item.department}
+                  </Typography>
+                </ListItemButton>
+              );
+            })}
           </List>
         </Collapse>
       ) : null}

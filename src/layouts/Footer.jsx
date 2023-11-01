@@ -1,20 +1,12 @@
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFacebook,
   faInstagram,
   faLinkedin,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
-import {
-  faBookBookmark,
-  faBookmark,
-  faEnvelope,
-  faInbox,
-  faIndent,
-  faInfo,
-  faMailBulk,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
 const Footer = () => {
   return (

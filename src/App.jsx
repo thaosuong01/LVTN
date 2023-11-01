@@ -16,6 +16,7 @@ import NotFoundPage from "./pages/NotFound";
 import PracticePage from "./pages/PracticePage";
 import UserEnroled from "./pages/UserEnroled";
 import { path } from "./utils/path";
+import UpdatePractice from "./pages/UpdatePractice";
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
         <Route element={<Index />}>
           <Route path={path.HOME} element={<Home />} />
           <Route path={path.LOGIN} element={<Login />} />
-          <Route path={path.LISTCOURSE} element={<ListCourse />} />
+          <Route path={`${path.LISTCOURSE}/:did`} element={<ListCourse />} />
           <Route path={`${path.COURSE}/:cid`} element={<Course />} />
           <Route path={`${path.CLASSPAGE}/:cid`} element={<ClassPage />} />
           <Route path={`${path.FOLDER}/:did`} element={<DocumentPage />} />
@@ -33,7 +34,14 @@ function App() {
           <Route path={path.LISTDEPARTMENT} element={<Department />} />
           <Route path={path.USERENROLED} element={<UserEnroled />} />
           <Route path={path.CREATEPRACTICE} element={<CreatePractice />} />
-          <Route path={path.PRACTICEPAGE} element={<PracticePage />} />
+          <Route
+            path={`/${path.UPDATEPRACTICE}/:eid`}
+            element={<UpdatePractice />}
+          />
+          <Route
+            path={`${path.PRACTICEPAGE}/:pid`}
+            element={<PracticePage />}
+          />
           <Route
             path={`${path.MANAGECOURSE}/:did`}
             element={<ManageCourse />}

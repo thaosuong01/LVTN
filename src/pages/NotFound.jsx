@@ -1,6 +1,6 @@
 import React from "react";
-import { path } from "../utils/path.js";
 import { Link } from "react-router-dom";
+import { path } from "../utils/path.js";
 
 const NotFoundPage = () => {
   return (

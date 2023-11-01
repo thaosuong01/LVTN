@@ -12,11 +12,11 @@ import { useSelector } from "react-redux";
 import RightNavigate from "../components/RightNavigate";
 
 import { Formik } from "formik";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { apiAddClass } from "../api/class";
-import { useNavigate, useParams } from "react-router-dom";
 import { path } from "../utils/path";
-import Swal from "sweetalert2";
 
 const AddCourse = () => {
   const { user } = useSelector((state) => state.user);

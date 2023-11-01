@@ -16,13 +16,12 @@ import dayjs from "dayjs";
 import { ErrorMessage, Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
-import { apiCreateExercise } from "../api/exercise";
+import { apiGetExerciseById, apiUpdateExerciseById } from "../api/exercise";
 import RightNavigate from "../components/RightNavigate";
-import { path } from "../utils/path";
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -41,9 +40,10 @@ export function renameFile(originalFile, newName) {
   });
 }
 
-const CreatePractice = () => {
-  const navigate = useNavigate();
+const UpdatePractice = () => {
   const [files, setFiles] = useState([]);
+  console.log("files: ", files);
+  // const [rejected, setRejected] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     console.log("acceptedFiles: ", acceptedFiles);
@@ -51,9 +51,9 @@ const CreatePractice = () => {
       setFiles((previousFiles) => [...previousFiles, ...acceptedFiles]);
     }
 
-    if (rejectedFiles?.length) {
-      setRejected((previousFiles) => [...previousFiles, ...rejectedFiles]);
-    }
+    // if (rejectedFiles?.length) {
+    //   setRejected((previousFiles) => [...previousFiles, ...rejectedFiles]);
+    // }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -76,15 +76,50 @@ const CreatePractice = () => {
   const removeAll = () => {
     setFiles([]);
   };
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
 
-  // Lấy giá trị của một tham số trên query string
-  const class_id = queryParams.get("class_id");
-  const topic_id = queryParams.get("topic_id");
+  // const removeRejected = (path) => {
+  //   setRejected((files) => files.filter(({ file }) => file.path !== path));
+  // };
+
+  const { eid } = useParams();
+
+  const [initialValues, setInitialValues] = useState({
+    title: "",
+    start_date: "",
+    start_time: "",
+    deadline_date: "",
+    deadline_time: "",
+    display: false,
+    files: "",
+  });
+
+  const getExerciseById = async (eid) => {
+    try {
+      const response = await apiGetExerciseById(eid);
+      const data = response?.data;
+      setInitialValues({
+        ...data,
+        start_date: data.start_time,
+        deadline_time: data.deadline,
+        deadline_date: data.deadline,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getExerciseById(eid);
+  }, [eid]);
+
+  const handleRemoveCurrentFile = (file, values) => {
+    setInitialValues({
+      ...values,
+      files: initialValues.files?.filter((item) => item !== file),
+    });
+  };
 
   const onSubmit = async (values, { setErrors }) => {
-    console.log("values: ", values);
     const {
       start_date,
       start_time,
@@ -94,12 +129,13 @@ const CreatePractice = () => {
       display,
     } = values;
 
-    const startDate = start_date.format("YYYY-MM-DD");
-    const startTime = start_time.format("HH:mm");
+    const startDate = dayjs(start_date).format("YYYY-MM-DD");
+
+    const startTime = dayjs(start_time).format("HH:mm");
     const dateTimeStart = `${startDate} ${startTime}:00`;
 
-    const deadlineDate = deadline_date.format("YYYY-MM-DD");
-    const deadlineTime = deadline_time.format("HH:mm");
+    const deadlineDate = dayjs(deadline_date).format("YYYY-MM-DD");
+    const deadlineTime = dayjs(deadline_time).format("HH:mm");
     const dateTimeDeadline = `${deadlineDate} ${deadlineTime}:00`;
 
     const start = dayjs(dateTimeStart);
@@ -114,13 +150,12 @@ const CreatePractice = () => {
       return;
     }
 
-    if (compareWithCurrentDate <= 0) {
-      setErrors({
-        start_time: "Thời gian bắt đầu phải lớn hơn thời gian hiện tại.",
-      });
-      return;
-    }
-
+    // if (compareWithCurrentDate <= 0) {
+    //   setErrors({
+    //     start_time: "Thời gian bắt đầu phải lớn hơn thời gian hiện tại.",
+    //   });
+    //   return;
+    // }
     try {
       const formData = new FormData();
       files.forEach((file) => {
@@ -128,19 +163,21 @@ const CreatePractice = () => {
       });
 
       formData.append("title", title);
-      formData.append("class_id", class_id);
-      formData.append("topic_id", topic_id);
       formData.append("display", display);
       formData.append("start_time", dateTimeStart);
       formData.append("deadline", dateTimeDeadline);
+      formData.append("newFiles", values.files);
 
-      const response = await apiCreateExercise(formData);
+      const response = await apiUpdateExerciseById(eid, formData);
       console.log("response: ", response);
-      if (response.status === 201) {
+      if (response.status === 200) {
         Swal.fire({
           text: "Tải lên thành công!",
           confirmButtonColor: "#ffae00",
-        }).then(() => navigate(`/${path.CLASSPAGE}/${class_id}`));
+        }).then(() => {
+          getExerciseById(eid);
+          setFiles([]);
+        });
       }
     } catch (error) {
       Swal.fire({
@@ -149,15 +186,6 @@ const CreatePractice = () => {
       });
       console.log(error);
     }
-  };
-
-  const initialValues = {
-    title: "",
-    start_date: "",
-    start_time: "",
-    deadline_date: "",
-    deadline_time: "",
-    display: false,
   };
 
   const validationSchema = Yup.object().shape({
@@ -228,7 +256,7 @@ const CreatePractice = () => {
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <div className="flex flex-col">
                               <DatePicker
-                                value={values.start_date ?? dayjs()}
+                                value={dayjs(values.start_date) ?? dayjs()}
                                 onChange={(newValue) =>
                                   setFieldValue("start_date", newValue)
                                 }
@@ -245,7 +273,7 @@ const CreatePractice = () => {
                                 onChange={(newValue) =>
                                   setFieldValue("start_time", newValue)
                                 }
-                                value={values.start_time ?? dayjs()}
+                                value={dayjs(values.start_time) ?? dayjs()}
                               />
                               <ErrorMessage name="start_time">
                                 {(msg) => (
@@ -265,7 +293,7 @@ const CreatePractice = () => {
                                 onChange={(newValue) =>
                                   setFieldValue("deadline_date", newValue)
                                 }
-                                value={values.deadline_date ?? dayjs()}
+                                value={dayjs(values.deadline_date) ?? dayjs()}
                               />
                               <ErrorMessage name="deadline_date">
                                 {(msg) => (
@@ -278,7 +306,7 @@ const CreatePractice = () => {
                                 onChange={(newValue) =>
                                   setFieldValue("deadline_time", newValue)
                                 }
-                                value={values.deadline_time ?? dayjs()}
+                                value={dayjs(values.deadline_time) ?? dayjs()}
                               />
                               <ErrorMessage name="deadline_time">
                                 {(msg) => (
@@ -344,23 +372,53 @@ const CreatePractice = () => {
                             </button>
                             <button
                               type="submit"
-                              className="ml-auto mt-1 text-[12px] uppercase tracking-wider font-bold text-neutral-500 border border-[#90c446] rounded-md px-3 hover:bg-button hover:text-white transition-colors"
+                              className="ml-auto mt-1 text-[12px] uppercase tracking-wider font-bold text-neutral-500 border border-[#90c446] rounded-md px-3 hover:bg-[#5b9608] hover:text-white transition-colors"
                             >
                               Upload Files
                             </button>
                           </div>
 
+                          {/** Current files */}
+                          <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
+                            Current Files
+                          </h3>
+                          <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10 mb-5">
+                            {values?.files.length > 0 &&
+                              values?.files?.map((file) => (
+                                <li
+                                  key={file}
+                                  className="relative h-32 rounded-md shadow-lg"
+                                >
+                                  <img
+                                    src="/../src/assets/icons/pdf-icon.png"
+                                    alt="PDF Icon"
+                                    className="h-full w-full object-contain rounded-md"
+                                  />
+                                  <button
+                                    type="button"
+                                    className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
+                                    onClick={() =>
+                                      handleRemoveCurrentFile(file, values)
+                                    }
+                                  >
+                                    <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
+                                  </button>
+                                  <span>{file}</span>
+                                </li>
+                              ))}
+                          </ul>
+
                           {/* Accepted files */}
                           {files?.length > 0 && (
                             <div>
-                              <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
+                              <h3 className="title text-lg font-semibold text-neutral-600 mt-14 border-b pb-3">
                                 Accepted Files
                               </h3>
                               <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10 mb-5">
                                 {files.map((file) => (
                                   <li
                                     key={file.path}
-                                    className="relative h-32 rounded-md shadow-lg"
+                                    className="relative h-32 rounded-md shadow-lg mb-5"
                                   >
                                     <img
                                       src="/../src/assets/icons/pdf-icon.png"
@@ -397,4 +455,4 @@ const CreatePractice = () => {
   );
 };
 
-export default CreatePractice;
+export default UpdatePractice;

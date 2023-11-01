@@ -3,7 +3,6 @@ import { Box, IconButton, InputLabel, Modal, TextField } from "@mui/material";
 import { Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useNavigate } from "react-router-dom";
 import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
@@ -110,9 +109,8 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
           confirmButtonColor: "#ffae00",
         });
 
-        handleClose()
-        onClose()
-        
+        handleClose();
+        onClose();
       }
     } catch (error) {
       Swal.fire({

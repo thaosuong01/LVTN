@@ -1,11 +1,10 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 
-import { default as React } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { default as React, useState } from "react";
+import { Link } from "react-router-dom";
 import { path } from "../utils/path";
 import UploadDocument from "./UploadDocument";
-import { useState } from "react";
 import UploadLecture from "./UploadLecture";
 
 const style = {
@@ -21,14 +20,6 @@ const style = {
 };
 
 const ModalAdd = ({ handleClose, topicId, classId, open, onClose }) => {
-  // const handleNavigate = (selectedActivity) => {
-  //   if (selectedActivity === "folder") {
-  //     navigate(`/${path.ADDACTIVITY}/folder/${classId}/${topicId}`);
-  //   } else if (selectedActivity === "document") {
-  //     navigate(`/${path.ADDACTIVITY}/document/${classId}/${topicId}`);
-  //   }
-  // };
-
   const [openModalUploadDocument, setOpenModalUploadDocument] = useState(false);
   const handleOpenModalUploadDocument = () => {
     setOpenModalUploadDocument(true);
@@ -117,7 +108,9 @@ const ModalAdd = ({ handleClose, topicId, classId, open, onClose }) => {
                   />
                   <span>Tài liệu</span>
                 </div>
-                <Link to={`/${path.CREATEPRACTICE}`}>
+                <Link
+                  to={`/${path.CREATEPRACTICE}?class_id=${classId}&topic_id=${topicId}`}
+                >
                   <div className="cursor-pointer hover:text-hover text-black flex flex-col items-center">
                     <img
                       src="/../src/assets/icons/exercise.png"

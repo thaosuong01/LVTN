@@ -1,14 +1,12 @@
 import { Button } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { TransitionGroup } from "react-transition-group";
+import { apiGetClassById } from "../api/class";
 import ListDocument from "../components/ListDocument";
 import RightNavigate from "../components/RightNavigate";
 import { toggleEditMode } from "../redux/courseSlice";
-import { apiGetClass, apiGetClassById } from "../api/class";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
 
 const ClassPage = () => {
   const dispatch = useDispatch();

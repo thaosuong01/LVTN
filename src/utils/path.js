@@ -12,5 +12,6 @@ export const path = {
   USERENROLED: "course/user-enroled",
   PRACTICEPAGE: "practice-page",
   CREATEPRACTICE: "practice/create",
+  UPDATEPRACTICE: "practice/update",
   FOLDER: "folder/document",
 };

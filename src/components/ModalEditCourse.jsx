@@ -15,10 +15,10 @@ import { Formik } from "formik";
 import { default as React, useEffect, useState } from "react";
 import { apiGetClassById, apiUpdateClass } from "../api/class";
 
-import * as Yup from "yup";
 import { useParams } from "react-router-dom";
-import { apiGetCourseByDepartment } from "../api/course";
 import Swal from "sweetalert2";
+import * as Yup from "yup";
+import { apiGetCourseByDepartment } from "../api/course";
 
 const style = {
   position: "absolute",

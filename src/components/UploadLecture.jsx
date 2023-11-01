@@ -3,11 +3,10 @@ import { Box, IconButton, InputLabel, Modal, TextField } from "@mui/material";
 import { Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useNavigate, useParams } from "react-router-dom";
+import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { uploadDocument } from "../api/upload";
-import slugify from "slugify";
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -235,64 +234,35 @@ const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
                             </div>
 
                             {/* Accepted files */}
-                            <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
-                              Accepted Files
-                            </h3>
-                            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
-                              {files.map((file) => (
-                                <li
-                                  key={file.path}
-                                  className="relative h-32 rounded-md shadow-lg"
-                                >
-                                  <img
-                                    src="/../src/assets/icons/pdf-icon.png"
-                                    alt="PDF Icon"
-                                    className="h-full w-full object-contain rounded-md"
-                                  />
-                                  <button
-                                    type="button"
-                                    className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
-                                    onClick={() => removeFile(file.path)}
-                                  >
-                                    <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
-                                  </button>
-                                  <span>{file.path}</span>
-                                </li>
-                              ))}
-                            </ul>
-
-                            {/* Rejected Files */}
-                            <h3 className="title text-lg font-semibold text-neutral-600 mt-24 border-b pb-3">
-                              Rejected Files
-                            </h3>
-                            <ul className="mt-6 flex flex-col">
-                              {rejected.map(({ file, errors }) => (
-                                <li
-                                  key={file.name}
-                                  className="flex items-start justify-between"
-                                >
-                                  <div>
-                                    <p className="mt-2 text-neutral-500 text-sm font-medium">
-                                      {file.name}
-                                    </p>
-                                    <ul className="text-[12px] text-red-400">
-                                      {errors.map((error) => (
-                                        <li key={error.code}>
-                                          {error.message}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    className="mt-1 py-1 text-[12px] uppercase tracking-wider font-bold text-neutral-500 border border-secondary-400 rounded-md px-3 hover:bg-secondary-400 hover:text-neutral-700 transition-colors"
-                                    onClick={() => removeRejected(file.path)}
-                                  >
-                                    Remove
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
+                            {files?.length > 0 && (
+                              <div>
+                                <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
+                                  Accepted Files
+                                </h3>
+                                <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
+                                  {files.map((file) => (
+                                    <li
+                                      key={file.path}
+                                      className="relative h-32 rounded-md shadow-lg"
+                                    >
+                                      <img
+                                        src="/../src/assets/icons/pdf-icon.png"
+                                        alt="PDF Icon"
+                                        className="h-full w-full object-contain rounded-md"
+                                      />
+                                      <button
+                                        type="button"
+                                        className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
+                                        onClick={() => removeFile(file.path)}
+                                      >
+                                        <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
+                                      </button>
+                                      <span>{file.path}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </section>
                         </div>
                       </form>

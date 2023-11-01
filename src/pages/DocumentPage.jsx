@@ -1,13 +1,11 @@
-import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { apiGetDocumentById, apiGetFilesByDocumentId } from "../api/upload";
-import RightNavigate from "../components/RightNavigate";
-import { useEffect } from "react";
-import { List, ListItem, Typography } from "@mui/material";
-import { path } from "../utils/path";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import { List, ListItem, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { apiGetDocumentById } from "../api/upload";
 import ModalEditDocument from "../components/ModalEditDocument";
+import RightNavigate from "../components/RightNavigate";
 
 const DocumentPage = () => {
   const { did } = useParams();

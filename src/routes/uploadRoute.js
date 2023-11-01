@@ -8,17 +8,17 @@ import {
   updateDocumentById,
   uploadDocument,
 } from "../controllers/uploadController.js";
-import slugify from "slugify";
+import fSlug from "../config/fslug.js";
 
-export const fSlug = (text) =>
-  slugify(text, {
-    replacement: "-", // replace spaces with replacement character, defaults to `-`
-    remove: undefined, // remove characters that match regex, defaults to `undefined`
-    lower: true, // convert to lower case, defaults to `false`
-    strict: false, // strip special characters except replacement, defaults to `false`
-    locale: "vi", // language code of the locale to use
-    trim: true, // trim leading and trailing replacement chars, defaults to `true`
-  });
+// export const fSlug = (text) =>
+//   slugify(text, {
+//     replacement: "-", // replace spaces with replacement character, defaults to `-`
+//     remove: undefined, // remove characters that match regex, defaults to `undefined`
+//     lower: true, // convert to lower case, defaults to `false`
+//     strict: false, // strip special characters except replacement, defaults to `false`
+//     locale: "vi", // language code of the locale to use
+//     trim: true, // trim leading and trailing replacement chars, defaults to `true`
+//   });
 
 const router = express.Router();
 
@@ -33,7 +33,14 @@ const storage = multer.diskStorage({
     cb(null, path);
   },
   filename: function (req, file, cb) {
-    cb(null, Buffer.from(fSlug(file.originalname), "latin1").toString("utf8"));
+    const timestamp = Date.now();
+    cb(
+      null,
+
+      `${timestamp}_${Buffer.from(fSlug(file.originalname), "latin1").toString(
+        "utf8"
+      )}`
+    );
   },
 });
 

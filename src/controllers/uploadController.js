@@ -6,7 +6,7 @@ import fs from "fs";
 export const uploadDocument = async (req, res, next) => {
   try {
     const file_name = req?.files?.map((file) =>
-      slugify(file.originalname, { lower: true, locale: "vi" })
+      slugify(file.filename, { lower: true, locale: "vi" })
     );
 
     const { class_id, topic_id, title } = await req.body;
@@ -101,7 +101,7 @@ export const updateDocumentById = async (req, res, next) => {
     }
 
     req?.files?.forEach((item) => {
-      files.push(item?.originalname);
+      files.push(item?.filename);
     });
 
     const document = await Document.findByIdAndUpdate(

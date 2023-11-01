@@ -9,10 +9,11 @@ import authRoute from "./routes/authRoute.js";
 import classRoute from "./routes/classRoute.js";
 import courseRoute from "./routes/courseRoute.js";
 import departmentRoute from "./routes/departmentRoute.js";
-import uploadRoute, { fSlug } from "./routes/uploadRoute.js";
+import uploadRoute from "./routes/uploadRoute.js";
 import roleRoute from "./routes/roleRoute.js";
 import topicRoute from "./routes/topicRoute.js";
 import userRoute from "./routes/userRoute.js";
+import exerciseRoute from "./routes/exerciseRoute.js";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 
@@ -47,6 +48,7 @@ app.use("/api/course", courseRoute);
 app.use("/api/class", classRoute);
 app.use("/api/topic", topicRoute);
 app.use("/api/upload", uploadRoute);
+app.use("/api/exercise", exerciseRoute);
 
 app.use((req, res, next) => {
   return next(new ApiError(404, "Not found"));

@@ -42,11 +42,8 @@ export const createExerciseController = async (req, res, next) => {
 export const updateExerciseController = async (req, res, next) => {
   try {
     const { eid } = req.params;
-    console.log("req.body: ", req.body);
     const { title, deadline, start_time, newFiles, display } = req.body;
-    // const { files: file_name } = req;
     const file_name = req?.files?.map((item) => item?.filename);
-    console.log("file_name: ", file_name);
     // Kiểm tra xem bài tập có tồn tại hay không
     const findExercise = await Exercise.findById(eid);
     if (!findExercise) {
@@ -105,13 +102,6 @@ export const updateExerciseController = async (req, res, next) => {
     req?.files?.forEach((item) => {
       files.push(item?.filename);
     });
-
-    // Xóa các tệp tin cũ
-    // for (const file of oldFiles) {
-    //   fs.unlink(`src/uploads/exercises/${file}`, (err) => {
-    //     if (err) throw err;
-    //   });
-    // }
 
     // Cập nhật thông tin bài tập và danh sách tệp tin mới
     const exercise = await Exercise.findByIdAndUpdate(

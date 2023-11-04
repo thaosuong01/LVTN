@@ -14,6 +14,7 @@ import roleRoute from "./routes/roleRoute.js";
 import topicRoute from "./routes/topicRoute.js";
 import userRoute from "./routes/userRoute.js";
 import exerciseRoute from "./routes/exerciseRoute.js";
+import exerciseSubmitRoute from "./routes/exerciseSubmitRoute.js";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 
@@ -49,6 +50,7 @@ app.use("/api/class", classRoute);
 app.use("/api/topic", topicRoute);
 app.use("/api/upload", uploadRoute);
 app.use("/api/exercise", exerciseRoute);
+app.use("/api/exercise-submit", exerciseSubmitRoute);
 
 app.use((req, res, next) => {
   return next(new ApiError(404, "Not found"));

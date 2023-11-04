@@ -98,7 +98,6 @@ export const updateDepartmentController = async (req, res, next) => {
 export const getDepartmentByIdController = async (req, res, next) => {
   try {
     const department_id = req.params.did;
-    console.log(department_id);
     const department = await Department.findById(department_id);
 
     if (!department) {

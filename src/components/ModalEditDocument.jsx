@@ -16,6 +16,7 @@ import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { apiGetDocumentById, apiUpdateDocumentById } from "../api/upload";
+import { fSlug } from "../utils/file";
 
 const style = {
   position: "absolute",
@@ -31,15 +32,15 @@ const style = {
   overflowY: "auto",
 };
 
-export const fSlug = (text) =>
-  slugify(text, {
-    replacement: "-", // replace spaces with replacement character, defaults to `-`
-    remove: undefined, // remove characters that match regex, defaults to `undefined`
-    lower: true, // convert to lower case, defaults to `false`
-    strict: false, // strip special characters except replacement, defaults to `false`
-    locale: "vi", // language code of the locale to use
-    trim: true, // trim leading and trailing replacement chars, defaults to `true`
-  });
+// export const fSlug = (text) =>
+//   slugify(text, {
+//     replacement: "-", // replace spaces with replacement character, defaults to `-`
+//     remove: undefined, // remove characters that match regex, defaults to `undefined`
+//     lower: true, // convert to lower case, defaults to `false`
+//     strict: false, // strip special characters except replacement, defaults to `false`
+//     locale: "vi", // language code of the locale to use
+//     trim: true, // trim leading and trailing replacement chars, defaults to `true`
+//   });
 
 export function renameFile(originalFile, newName) {
   return new File([originalFile], newName, {

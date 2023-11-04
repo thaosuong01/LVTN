@@ -32,13 +32,9 @@ const NavigationItem = ({ label, pathData, children = [] }) => {
           )
         ) : null}
 
-        <Link
-          to={`/${path.LISTCOURSE}/`}
-          variant="body1"
-          sx={{ fontSize: "14px" }}
-        >
+        <span variant="body1" sx={{ fontSize: "14px" }}>
           {label}
-        </Link>
+        </span>
       </ListItemButton>
 
       {children?.length ? (

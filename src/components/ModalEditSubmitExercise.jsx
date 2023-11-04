@@ -5,7 +5,12 @@ import { Formik } from "formik";
 import { default as React, useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { fSlug, renameFile } from "../utils/file";
-import { apiCreateExerciseSubmit } from "../api/exerciseSubmit";
+import {
+  apiCreateExerciseSubmit,
+  apiGetAllExerciseSubmitByExerciseId,
+  apiGetExerciseSubmitByStudentId,
+  apiUpdateExerciseSubmitById,
+} from "../api/exerciseSubmit";
 import Swal from "sweetalert2";
 
 const style = {
@@ -22,13 +27,8 @@ const style = {
   overflowY: "auto",
 };
 
-const ModalSubmitExercise = ({
-  handleClose,
-  open,
-  pid,
-  student_id,
-  fetchExerciseSubmits,
-}) => {
+const ModalEditSubmitExercise = ({ handleClose, open, pid, student_id }) => {
+  console.log("pid: ", pid);
   const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
@@ -57,6 +57,43 @@ const ModalSubmitExercise = ({
     setFiles([]);
   };
 
+  const handleRemoveCurrentFile = (file, values) => {
+    setvalues((prev) => ({
+      ...prev,
+      files: values.files?.filter((item) => item !== file),
+    }));
+  };
+
+  const [values, setvalues] = useState({});
+  console.log("values: ", values);
+
+  // Fetch exercise submit by student id
+  const fetchExerciseSubmitdetail = async (student_id) => {
+    const response = await apiGetExerciseSubmitByStudentId(student_id);
+    if (response.status === 200) {
+      setvalues(response?.data[0]);
+    }
+  };
+
+  const [exerciseSubmit, setExerciseSubmit] = useState([]);
+
+  const fetchExerciseSubmits = async (pid) => {
+    const response = await apiGetAllExerciseSubmitByExerciseId(pid);
+    if (response.status === 200) {
+      setExerciseSubmit(response?.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchExerciseSubmits(pid);
+  }, [pid]);
+
+  useEffect(() => {
+    if (student_id) {
+      fetchExerciseSubmitdetail(student_id);
+    }
+  }, [student_id, open]);
+
   const handleUploadFiles = async (e) => {
     e.preventDefault();
     try {
@@ -65,11 +102,10 @@ const ModalSubmitExercise = ({
         formData.append("files", renameFile(file, fSlug(file.name)));
       });
 
-      formData.append("student_id", student_id);
-      formData.append("exercise_id", pid);
+      formData.append("newFiles", values?.files);
 
-      const response = await apiCreateExerciseSubmit(formData);
-      if (response?.status === 201) {
+      const response = await apiUpdateExerciseSubmitById(values?._id, formData);
+      if (response?.status === 200) {
         handleClose();
         setFiles([]);
         Swal.fire({
@@ -119,7 +155,7 @@ const ModalSubmitExercise = ({
                   className="w-[70%]"
                   sx={{ fontWeight: "bold" }}
                 >
-                  Tải lên kết quả
+                  Tải lên kết quả chỉnh sửa
                 </Typography>
               </div>
               <div>
@@ -168,6 +204,35 @@ const ModalSubmitExercise = ({
                         </button>
                       </div>
 
+                      {/* Current files */}
+                      <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
+                        Current Files
+                      </h3>
+                      <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
+                        {values?.files?.map((file) => (
+                          <li
+                            key={file}
+                            className="relative h-32 rounded-md shadow-lg"
+                          >
+                            <img
+                              src="/../src/assets/icons/pdf-icon.png"
+                              alt="PDF Icon"
+                              className="h-full w-full object-contain rounded-md"
+                            />
+                            <button
+                              type="button"
+                              className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
+                              onClick={() =>
+                                handleRemoveCurrentFile(file, values)
+                              }
+                            >
+                              <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
+                            </button>
+                            <span>{file}</span>
+                          </li>
+                        ))}
+                      </ul>
+
                       {/* Accepted files */}
                       {files?.length > 0 && (
                         <div>
@@ -210,4 +275,4 @@ const ModalSubmitExercise = ({
   );
 };
 
-export default ModalSubmitExercise;
+export default ModalEditSubmitExercise;

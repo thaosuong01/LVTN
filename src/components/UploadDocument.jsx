@@ -7,6 +7,7 @@ import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { uploadDocument } from "../api/upload";
+import { renameFile } from "../utils/file.js";
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -17,13 +18,6 @@ export const fSlug = (text) =>
     locale: "vi", // language code of the locale to use
     trim: true, // trim leading and trailing replacement chars, defaults to `true`
   });
-
-export function renameFile(originalFile, newName) {
-  return new File([originalFile], newName, {
-    type: originalFile.type,
-    lastModified: originalFile.lastModified,
-  });
-}
 
 const style = {
   position: "absolute",

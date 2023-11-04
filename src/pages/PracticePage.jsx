@@ -6,28 +6,56 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import { apiGetExerciseById } from "../api/exercise";
+import { apiGetAllExerciseSubmitByExerciseId } from "../api/exerciseSubmit";
 import ModalSubmitExercise from "../components/ModalSubmitExercise";
 import RightNavigate from "../components/RightNavigate";
+import ModalEditSubmitExercise from "../components/ModalEditSubmitExercise";
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 const PracticePage = () => {
   const { user } = useSelector((state) => state.user);
-  console.log("user: ", user);
+  const { pid } = useParams();
+  const [exercise, setExercise] = useState({});
+  const [exerciseSubmit, setExerciseSubmit] = useState([]);
+
+  const getExerciseById = async (pid) => {
+    const response = await apiGetExerciseById(pid);
+    if (response?.status === 200) {
+      setExercise(response?.data);
+    }
+  };
+
+  const fetchExerciseSubmits = async (pid) => {
+    const response = await apiGetAllExerciseSubmitByExerciseId(pid);
+    if (response.status === 200) {
+      setExerciseSubmit(response?.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchExerciseSubmits(pid);
+  }, [pid]);
+
+  useEffect(() => {
+    getExerciseById(pid);
+  }, [pid]);
+
+  const exerciseOfStudent = exerciseSubmit.filter(
+    (item) => item?.student_id === user?._id && item
+  )[0];
+
   const [openModalSubmit, setOpenModalSubmit] = useState(false);
+  const [openModalEditSubmit, setOpenModalEditSubmit] = useState(false);
 
   const handleOpenModalSubmit = () => {
     setOpenModalSubmit(true);
@@ -35,6 +63,29 @@ const PracticePage = () => {
 
   const handleCloseModalSubmit = () => {
     setOpenModalSubmit(false);
+  };
+  const handleOpenModalEditSubmit = () => {
+    setOpenModalEditSubmit(true);
+  };
+
+  const handleCloseModalEditSubmit = () => {
+    setOpenModalEditSubmit(false);
+  };
+
+  const remainingTime = (exercise) => {
+    const deadline = dayjs(exercise.deadline);
+    const currentTime = dayjs();
+    const remainingTime = dayjs.duration(deadline.diff(currentTime));
+    let formattedTime;
+    if (currentTime.isAfter(deadline)) {
+      const overdueTime = dayjs.duration(currentTime.diff(deadline));
+      formattedTime =
+        "Đã muộn " + overdueTime.format("D [ngày] H [giờ] m [phút]");
+    } else {
+      formattedTime = remainingTime.format("D [ngày] H [giờ] m [phút]");
+    }
+
+    return formattedTime;
   };
   return (
     <>
@@ -48,46 +99,83 @@ const PracticePage = () => {
                 >
                   Trạng thái nộp
                 </Typography>
-                <div className="my-4 p-2">
+                <div className="my-4 border">
                   <div className="flex bg-slate-200 p-2">
                     <Typography className="w-[30%]">Trạng thái nộp</Typography>
                     <span className="w-[70%]">
-                      Nothing has been sumitted for this assignment
+                      {exerciseOfStudent?.files?.length > 0
+                        ? "Đã nộp"
+                        : "Nothing has been sumitted for this assignment"}
                     </span>
                   </div>
                   <div className="flex p-2">
                     <Typography className="w-[30%]">
                       Tình trạng chấm điểm
                     </Typography>
-                    <span className="w-[70%]">Not graded</span>
+                    <span className="w-[70%]">
+                      {exerciseOfStudent?.exercise_score ?? "Chưa chấm điểm"}
+                    </span>
                   </div>
                   <div className="flex bg-slate-200 p-2">
                     <Typography className="w-[30%]">Hạn chót</Typography>
                     <span className="w-[70%]">
-                      Saturday, 10 November 2023, 12:00 AM
+                      {dayjs(exercise?.deadline).format(
+                        "dddd, DD MMMM YYYY, hh:mm A"
+                      )}
                     </span>
                   </div>
                   <div className="flex p-2">
                     <Typography className="w-[30%]">
                       Thời gian còn lại
                     </Typography>
-                    <span className="w-[70%]">9 ngày 1 giờ 10 phút</span>
+                    <span className="w-[70%]">{remainingTime(exercise)}</span>
                   </div>
                   <div className="flex bg-slate-200 p-2">
                     <Typography className="w-[30%]">
                       Sửa đổi lần cuối
                     </Typography>
-                    <span className="w-[70%]">-</span>
+                    <span className="w-[70%]">
+                      {dayjs(exerciseOfStudent?.updatedAt).format(
+                        "dddd, DD MMMM YYYY, hh:mm A"
+                      ) ?? "-"}
+                    </span>
+                  </div>
+                  <div className="flex p-2">
+                    <Typography className="w-[30%]">File đã nộp</Typography>
+                    <div className="w-[70%] flex flex-col">
+                      {exerciseOfStudent?.files.map((file, index) => (
+                        <Link
+                          className="w-full"
+                          to={`${
+                            import.meta.env.VITE_SERVER_URL
+                          }/exercise-submit/${file}`}
+                          key={index}
+                        >
+                          {file}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
+
                 <div className="flex justify-center">
-                  <button
-                    onClick={() => handleOpenModalSubmit()}
-                    type="submit"
-                    className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-2"
-                  >
-                    Nộp bài
-                  </button>
+                  {exerciseOfStudent ? (
+                    <button
+                      onClick={() => handleOpenModalEditSubmit()}
+                      type="submit"
+                      className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-2"
+                    >
+                      Chỉnh sửa
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleOpenModalSubmit()}
+                      type="submit"
+                      className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-2"
+                    >
+                      Nộp bài
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -153,10 +241,21 @@ const PracticePage = () => {
         </div>
       </div>
 
+      {/* Model add & edit submit exercise */}
       <ModalSubmitExercise
         open={openModalSubmit}
         handleClose={handleCloseModalSubmit}
-      ></ModalSubmitExercise>
+        pid={pid}
+        student_id={user?._id}
+        fetchExerciseSubmits={fetchExerciseSubmits}
+      />
+
+      <ModalEditSubmitExercise
+        open={openModalEditSubmit}
+        student_id={user?._id}
+        pid={pid}
+        handleClose={handleCloseModalEditSubmit}
+      />
     </>
   );
 };

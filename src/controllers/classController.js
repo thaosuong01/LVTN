@@ -42,6 +42,7 @@ export const getAllClassController = async (req, res, next) => {
   try {
     const classes = await Class.find()
       .populate("course_id", "course_code course_name")
+      .populate("owner", "fullname")
       .select("-class_pass");
 
     res.status(200).json(classes);

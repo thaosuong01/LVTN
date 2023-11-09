@@ -4,7 +4,9 @@ import multer from "multer";
 import {
   deleteDocumentById,
   getDocumentById,
+  getDocumentController,
   getDocumentsByClassId,
+  getDocumentsController,
   updateDocumentById,
   uploadDocument,
 } from "../controllers/uploadController.js";
@@ -51,5 +53,6 @@ router.get("/document/:did", getDocumentById);
 router.delete("/delete-document/:did", deleteDocumentById);
 router.put("/update-document/:did", upload.array("files"), updateDocumentById);
 router.get("/document-by-class-id/:cid", getDocumentsByClassId);
+router.get("/get-document", getDocumentsController);
 
 export default router;

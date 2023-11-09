@@ -5,12 +5,12 @@ const exerciseSubmitSchema = new Schema(
   {
     student_id: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "users",
       required: true,
     },
     exercise_id: {
       type: Schema.Types.ObjectId,
-      ref: "Exercise",
+      ref: "exercises",
       required: true,
     },
     exercise_score: {

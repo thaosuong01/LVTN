@@ -4,32 +4,22 @@ import {
   getAllUserController,
   getCurrentUserController,
   getUserByIdController,
+  updateProfile,
   updateUser,
 } from "../controllers/userController.js";
-import {
-  isAdmin,
-  isAuthentication,
-  isTeacher,
-} from "../middlewares/auth-middleware.js";
+import { isAdmin, isAuthentication } from "../middlewares/auth-middleware.js";
 
 const router = express.Router();
 
-router.get("/admin/get-all", [isAuthentication, isAdmin], getAllUserController);
-router.get(
-  "/admin/get-user/:id",
-  [isAuthentication, isAdmin],
-  getUserByIdController
-);
-router.get(
-  "/get-current-user",
-  [isAuthentication],
-  getCurrentUserController
-);
+router.get("/get-all", [isAuthentication, isAdmin], getAllUserController);
+router.get("/get-user/:id", [isAuthentication, isAdmin], getUserByIdController);
+router.get("/get-current-user", [isAuthentication], getCurrentUserController);
+router.put("/update-user/:id", [isAuthentication, isAdmin], updateUser);
 router.delete(
-  "/admin/delete-user/:id",
+  "/delete-user/:id",
   [isAuthentication, isAdmin],
   deleteUserController
 );
-router.put("/update", [isAuthentication], updateUser);
+router.put("/update-profile", [isAuthentication], updateProfile);
 
 export default router;

@@ -54,7 +54,7 @@ export const updateRoleController = async (req, res, next) => {
       return next(new ApiError(404, "Role not found"));
     }
 
-    return res.status(201).json(updatedRole);
+    return res.status(200).json(updatedRole);
   } catch (error) {
     next(new ApiError(500, error.message));
   }

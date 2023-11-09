@@ -94,12 +94,6 @@ export const deleteExerciseSubmitById = async (req, res, next) => {
   }
 };
 
-// export const getExerciseSubmits = async (req, res, next) => {
-//   const exercises = await ExerciseSubmit.find();
-
-//   return res.status(200).json(exercises);
-// };
-
 export const getExerciseSubmitById = async (req, res, next) => {
   try {
     const { es_id } = req.params;
@@ -117,7 +111,13 @@ export const getExerciseSubmitById = async (req, res, next) => {
 export const getExerciseSubmitByExerciseId = async (req, res, next) => {
   try {
     const { eid } = req.params;
-    const exerciseSubmit = await ExerciseSubmit.find({ exercise_id: eid });
+    const exerciseSubmit = await ExerciseSubmit.find({
+      exercise_id: eid,
+    }).populate({
+      path: "student_id",
+      select: "fullname email",
+      populate: { path: "account_id", select: "username" },
+    });
 
     if (!exerciseSubmit) {
       throw new ApiError(404, "Exercise submit not found");

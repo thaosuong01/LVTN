@@ -89,7 +89,7 @@ export const updateDepartmentController = async (req, res, next) => {
       return next(new ApiError(404, "Department not found"));
     }
 
-    return res.status(201).json(updatedDepartment);
+    return res.status(200).json(updatedDepartment);
   } catch (error) {
     next(new ApiError(500, error.message));
   }
@@ -97,7 +97,7 @@ export const updateDepartmentController = async (req, res, next) => {
 
 export const getDepartmentByIdController = async (req, res, next) => {
   try {
-    const department_id = req.params.did;
+    const department_id = req.params.id;
     const department = await Department.findById(department_id);
 
     if (!department) {

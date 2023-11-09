@@ -29,7 +29,11 @@ export const getDocumentById = async (req, res, next) => {
   try {
     const documentId = req.params.did;
 
-    const document = await Document.findById(documentId);
+    const document = await Document.findById(documentId).populate({
+      path: "class_id",
+      select: "class_name class_code",
+      populate: { path: "owner", select: "fullname" },
+    });
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
     }
@@ -65,6 +69,20 @@ export const getDocumentsByClassId = async (req, res, next) => {
     if (!documents) {
       throw new ApiError(404, "No documents found");
     }
+
+    return res.status(200).json({ documents });
+  } catch (error) {
+    console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const getDocumentsController = async (req, res, next) => {
+  try {
+    const documents = await Document.find().populate({
+      path: "class_id",
+      select: "class_code class_name",
+    });
 
     return res.status(200).json({ documents });
   } catch (error) {

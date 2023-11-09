@@ -5,12 +5,12 @@ const documentSchema = new Schema(
   {
     class_id: {
       type: Schema.Types.ObjectId,
-      ref: "Class",
+      ref: "classes",
       required: true,
     },
     topic_id: {
       type: Schema.Types.ObjectId,
-      ref: "Topic",
+      ref: "topic",
       required: true,
     },
     title: {

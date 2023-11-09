@@ -27,12 +27,14 @@ export const createCourseController = async (req, res, next) => {
 export const updateCourseController = async (req, res, next) => {
   try {
     const course_id = await req.params.id;
+    console.log('course_id: ', course_id);
 
     const { course_code, course_name, department_id } = await req.body;
 
     const courseExists = await Course.exists({ course_code });
+    console.log('courseExists: ', courseExists);
 
-    if (courseExists && course_id !== courseExists.id) {
+    if (courseExists && course_id === courseExists._id) {
       return next(new ApiError(409, "Course code already exists"));
     }
 
@@ -50,7 +52,7 @@ export const updateCourseController = async (req, res, next) => {
       return next(new ApiError(404, "Course not found"));
     }
 
-    return res.status(201).json(update);
+    return res.status(200).json(update);
   } catch (error) {
     console.log(error);
     next(new ApiError(500, error.message));

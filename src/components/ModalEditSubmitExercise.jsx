@@ -27,7 +27,13 @@ const style = {
   overflowY: "auto",
 };
 
-const ModalEditSubmitExercise = ({ handleClose, open, pid, student_id }) => {
+const ModalEditSubmitExercise = ({
+  handleClose,
+  open,
+  pid,
+  student_id,
+  fetchExerciseSubmits,
+}) => {
   console.log("pid: ", pid);
   const [files, setFiles] = useState([]);
 
@@ -72,15 +78,6 @@ const ModalEditSubmitExercise = ({ handleClose, open, pid, student_id }) => {
     const response = await apiGetExerciseSubmitByStudentId(student_id);
     if (response.status === 200) {
       setvalues(response?.data[0]);
-    }
-  };
-
-  const [exerciseSubmit, setExerciseSubmit] = useState([]);
-
-  const fetchExerciseSubmits = async (pid) => {
-    const response = await apiGetAllExerciseSubmitByExerciseId(pid);
-    if (response.status === 200) {
-      setExerciseSubmit(response?.data);
     }
   };
 

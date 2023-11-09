@@ -1,11 +1,5 @@
-import { Typography } from "@mui/material";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import { Box, Container, Typography } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -15,9 +9,9 @@ import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { apiGetExerciseById } from "../api/exercise";
 import { apiGetAllExerciseSubmitByExerciseId } from "../api/exerciseSubmit";
+import ModalEditSubmitExercise from "../components/ModalEditSubmitExercise";
 import ModalSubmitExercise from "../components/ModalSubmitExercise";
 import RightNavigate from "../components/RightNavigate";
-import ModalEditSubmitExercise from "../components/ModalEditSubmitExercise";
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -28,8 +22,12 @@ const PracticePage = () => {
   const [exercise, setExercise] = useState({});
   const [exerciseSubmit, setExerciseSubmit] = useState([]);
 
+  const [openModalSubmit, setOpenModalSubmit] = useState(false);
+  const [openModalEditSubmit, setOpenModalEditSubmit] = useState(false);
+
   const getExerciseById = async (pid) => {
     const response = await apiGetExerciseById(pid);
+
     if (response?.status === 200) {
       setExercise(response?.data);
     }
@@ -50,12 +48,14 @@ const PracticePage = () => {
     getExerciseById(pid);
   }, [pid]);
 
-  const exerciseOfStudent = exerciseSubmit.filter(
-    (item) => item?.student_id === user?._id && item
-  )[0];
-
-  const [openModalSubmit, setOpenModalSubmit] = useState(false);
-  const [openModalEditSubmit, setOpenModalEditSubmit] = useState(false);
+  const [exerciseOfStudent, setExerciseOfStudent] = useState({});
+  useEffect(() => {
+    setExerciseOfStudent(
+      exerciseSubmit.filter(
+        (item) => item?.student_id?._id === user?._id && item
+      )[0]
+    );
+  }, [exerciseSubmit]);
 
   const handleOpenModalSubmit = () => {
     setOpenModalSubmit(true);
@@ -87,6 +87,38 @@ const PracticePage = () => {
 
     return formattedTime;
   };
+
+  const columns = [
+    {
+      field: "fullname",
+      headerName: "Full Name",
+      width: 150,
+      valueGetter: (params) => params.row.student_id?.fullname,
+    },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 120,
+      valueGetter: (params) => params.row.student_id?.account_id?.username,
+    },
+    {
+      field: "student_id",
+      headerName: "Email",
+      width: 200,
+      valueGetter: (params) => params.row.student_id?.email,
+    },
+    {
+      field: "files",
+      headerName: "Files",
+      width: 350,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 100,
+    },
+  ];
+
   return (
     <>
       <div className="bg-white py-8">
@@ -134,16 +166,20 @@ const PracticePage = () => {
                     <Typography className="w-[30%]">
                       Sửa đổi lần cuối
                     </Typography>
-                    <span className="w-[70%]">
-                      {dayjs(exerciseOfStudent?.updatedAt).format(
-                        "dddd, DD MMMM YYYY, hh:mm A"
-                      ) ?? "-"}
-                    </span>
+                    {exerciseOfStudent?.updatedAt ? (
+                      <span className="w-[70%]">
+                        {dayjs(exerciseOfStudent?.updatedAt).format(
+                          "dddd, DD MMMM YYYY, hh:mm A"
+                        )}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
                   </div>
                   <div className="flex p-2">
                     <Typography className="w-[30%]">File đã nộp</Typography>
                     <div className="w-[70%] flex flex-col">
-                      {exerciseOfStudent?.files.map((file, index) => (
+                      {exerciseOfStudent?.files?.map((file, index) => (
                         <Link
                           className="w-full"
                           to={`${
@@ -187,51 +223,62 @@ const PracticePage = () => {
                   Bài tập 1
                 </Typography>
 
-                <div className="my-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <Typography fontSize={20} fontWeight={700}>
+                <Container maxWidth={"lg"}>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                    marginBottom={2}
+                  >
+                    <Typography
+                      variant="h6"
+                      color="initial"
+                      fontWeight={"bold"}
+                    >
                       Danh sách kết quả
                     </Typography>
-                    <button className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-1">
-                      Xuất file
-                    </button>
-                  </div>
-                  <div className="my-2">
-                    <TableContainer component={Paper}>
-                      <Table
-                        sx={{ minWidth: 700 }}
-                        aria-label="customized table"
-                      >
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                              Họ và tên
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                              Mã số sinh viên
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                              Email
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                              Kết quả
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                              Trạng thái
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          <TableCell>Nhan Chí Danh</TableCell>
-                          <TableCell>B1910196</TableCell>
-                          <TableCell>nhanchidanh@gmail.com</TableCell>
-                          <TableCell>files.pdf</TableCell>
-                          <TableCell>Đã nộp</TableCell>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </div>
-                </div>
+                  </Box>
+                  <Box sx={{ height: 430, width: "100%" }}>
+                    <DataGrid
+                      checkboxSelection
+                      rows={exerciseSubmit}
+                      columns={columns}
+                      initialState={{
+                        pagination: {
+                          paginationModel: {
+                            pageSize: 5,
+                          },
+                        },
+                      }}
+                      slots={{ toolbar: GridToolbar }}
+                      slotProps={{
+                        toolbar: {
+                          showQuickFilter: true,
+                        },
+                      }}
+                      getRowId={(exerciseSubmit) => exerciseSubmit._id}
+                      pageSizeOptions={[5]}
+                      sx={{
+                        "& div div div div div .MuiDataGrid-withBorderColor": {
+                          borderBottomColor: "#ccc",
+                        },
+                        "& div .MuiDataGrid-columnHeaders": {
+                          borderColor: "#ccc",
+                        },
+                        // Table head
+                        "& div div div div div div div div .MuiDataGrid-columnHeaderTitle":
+                          {
+                            fontWeight: "700",
+                            textTransform: "uppercase",
+                          },
+
+                        borderColor: "#ccc",
+                        boxShadow: "1px 1px 5px 1px #ddd",
+                        borderRadius: "5px",
+                        fontSize: "14px",
+                      }}
+                    />
+                  </Box>
+                </Container>
               </div>
             )}
           </div>
@@ -242,20 +289,25 @@ const PracticePage = () => {
       </div>
 
       {/* Model add & edit submit exercise */}
-      <ModalSubmitExercise
-        open={openModalSubmit}
-        handleClose={handleCloseModalSubmit}
-        pid={pid}
-        student_id={user?._id}
-        fetchExerciseSubmits={fetchExerciseSubmits}
-      />
+      {openModalSubmit && (
+        <ModalSubmitExercise
+          open={openModalSubmit}
+          handleClose={handleCloseModalSubmit}
+          pid={pid}
+          student_id={user?._id}
+          fetchExerciseSubmits={fetchExerciseSubmits}
+        />
+      )}
 
-      <ModalEditSubmitExercise
-        open={openModalEditSubmit}
-        student_id={user?._id}
-        pid={pid}
-        handleClose={handleCloseModalEditSubmit}
-      />
+      {openModalEditSubmit && (
+        <ModalEditSubmitExercise
+          fetchExerciseSubmits={fetchExerciseSubmits}
+          open={openModalEditSubmit}
+          student_id={user?._id}
+          pid={pid}
+          handleClose={handleCloseModalEditSubmit}
+        />
+      )}
     </>
   );
 };

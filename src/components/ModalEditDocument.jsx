@@ -12,7 +12,6 @@ import { Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useNavigate, useParams } from "react-router-dom";
-import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { apiGetDocumentById, apiUpdateDocumentById } from "../api/upload";

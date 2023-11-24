@@ -17,9 +17,11 @@ export const createClassController = async (req, res, next) => {
     }
 
     const { user_id } = req.account;
-
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(class_pass, salt);
+    let passwordHash = null;
+    if (class_pass) {
+      const salt = await bcrypt.genSalt();
+      passwordHash = await bcrypt.hash(class_pass, salt);
+    }
 
     const createClass = await Class.create({
       class_code,
@@ -54,9 +56,10 @@ export const getAllClassController = async (req, res, next) => {
 
 export const getClassByIdController = async (req, res, next) => {
   try {
-    const getClass = await Class.findById(req.params.id)
-      .populate("course_id", "course_code course_name")
-      .select("-class_pass");
+    const getClass = await Class.findById(req.params.id).populate(
+      "course_id",
+      "course_code course_name class_pass"
+    );
 
     if (!getClass) {
       return next(new ApiError(404, "Class not found"));
@@ -76,12 +79,15 @@ export const updateClassController = async (req, res, next) => {
     const { class_code, class_name, class_pass, course_id, display } =
       await req.body;
 
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(class_pass, salt);
+
     const update = await Class.findByIdAndUpdate(
       class_id,
       {
         class_code,
         class_name,
-        class_pass,
+        class_pass: passwordHash,
         course_id,
         display,
       },
@@ -128,6 +134,18 @@ export const getClassInCourseController = async (req, res, next) => {
     );
 
     return res.status(200).json(getClass);
+  } catch (error) {
+    console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const getClassCreatedByOwner = async (req, res, next) => {
+  try {
+    const { user_id } = await req.account;
+
+    const classes = await Class.find({ owner: user_id });
+    return res.status(200).json(classes);
   } catch (error) {
     console.log(error);
     next(new ApiError(500, error.message));

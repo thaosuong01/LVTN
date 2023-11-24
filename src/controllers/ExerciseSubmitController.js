@@ -4,7 +4,7 @@ import fs from "fs";
 
 export const createExerciseSubmitController = async (req, res, next) => {
   try {
-    const { student_id, exercise_id } = req.body;
+    const { student_id, exercise_id, time_submit } = req.body;
     const filename = req?.files?.map((item) => item?.filename);
 
     if (!student_id || !exercise_id) {
@@ -15,6 +15,7 @@ export const createExerciseSubmitController = async (req, res, next) => {
       files: filename,
       student_id,
       exercise_id,
+      time_submit,
     });
     return res.status(201).json(exerciseSubmit);
   } catch (error) {
@@ -33,7 +34,7 @@ export const createExerciseSubmitController = async (req, res, next) => {
 export const updateExerciseSubmitController = async (req, res, next) => {
   try {
     const { es_id } = req.params;
-    const { newFiles } = req.body;
+    const { newFiles, time_submit } = req.body;
     const file_name = req.files?.map((file) => file.filename);
     console.log("file_name: ", file_name);
 
@@ -67,6 +68,7 @@ export const updateExerciseSubmitController = async (req, res, next) => {
       {
         ...req.body,
         files,
+        time_submit,
       },
       { new: true }
     );
@@ -97,7 +99,11 @@ export const deleteExerciseSubmitById = async (req, res, next) => {
 export const getExerciseSubmitById = async (req, res, next) => {
   try {
     const { es_id } = req.params;
-    const exerciseSubmit = await ExerciseSubmit.findById(es_id);
+    const exerciseSubmit = await ExerciseSubmit.findById(es_id).populate({
+      path: "student_id",
+      select: "fullname email",
+      populate: { path: "account_id", select: "username" },
+    });
 
     if (!exerciseSubmit) {
       throw new ApiError(404, "Exercise submit not found");
@@ -137,6 +143,27 @@ export const getExerciseSubmitByStudentId = async (req, res, next) => {
       throw new ApiError(404, "Exercise submit not found");
     }
     return res.status(200).json(exerciseSubmit);
+  } catch (error) {
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const gradeAndReviewExerciseSubmit = async (req, res, next) => {
+  try {
+    const exerciseSubmitId = await req.params.es_id;
+    const { grade, comment } = await req.body;
+
+    const exerciseSubmit = await ExerciseSubmit.findByIdAndUpdate(
+      exerciseSubmitId,
+      { grade, comment },
+      { new: true }
+    );
+
+    if (!exerciseSubmit) {
+      throw new ApiError(404, "Exercise submit not found");
+    }
+
+    return res.status(201).json(exerciseSubmit);
   } catch (error) {
     next(new ApiError(500, error.message));
   }

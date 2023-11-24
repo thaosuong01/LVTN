@@ -13,7 +13,7 @@ const exerciseSubmitSchema = new Schema(
       ref: "exercises",
       required: true,
     },
-    exercise_score: {
+    grade: {
       type: Number,
     },
     comment: {
@@ -24,6 +24,9 @@ const exerciseSubmitSchema = new Schema(
         type: String,
       },
     ],
+    time_submit:{
+      type: Date
+    }
 
   },
   { timestamps: true, versionKey: false }

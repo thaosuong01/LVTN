@@ -8,6 +8,7 @@ import {
   getExerciseSubmitByExerciseId,
   getExerciseSubmitById,
   getExerciseSubmitByStudentId,
+  gradeAndReviewExerciseSubmit,
   updateExerciseSubmitController,
 } from "../controllers/ExerciseSubmitController.js";
 
@@ -52,5 +53,7 @@ router.put(
   upload.array("files"),
   updateExerciseSubmitController
 );
+
+router.put("/grade-and-comment/:es_id", gradeAndReviewExerciseSubmit);
 
 export default router;

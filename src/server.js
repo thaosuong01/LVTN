@@ -3,20 +3,21 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import helmet from "helmet";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import { ApiError } from "./middlewares/api-error.js";
 import authRoute from "./routes/authRoute.js";
 import classRoute from "./routes/classRoute.js";
 import courseRoute from "./routes/courseRoute.js";
 import departmentRoute from "./routes/departmentRoute.js";
-import uploadRoute from "./routes/uploadRoute.js";
-import roleRoute from "./routes/roleRoute.js";
-import topicRoute from "./routes/topicRoute.js";
-import userRoute from "./routes/userRoute.js";
+import enrolRoute from "./routes/enrolRoute.js";
 import exerciseRoute from "./routes/exerciseRoute.js";
 import exerciseSubmitRoute from "./routes/exerciseSubmitRoute.js";
-import { fileURLToPath } from "url";
-import path, { dirname } from "path";
+import roleRoute from "./routes/roleRoute.js";
+import topicRoute from "./routes/topicRoute.js";
+import uploadRoute from "./routes/uploadRoute.js";
+import userRoute from "./routes/userRoute.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -46,6 +47,7 @@ app.use("/api/role", roleRoute);
 app.use("/api/department", departmentRoute);
 app.use("/api/user", userRoute);
 app.use("/api/course", courseRoute);
+app.use("/api/enrol", enrolRoute);
 app.use("/api/class", classRoute);
 app.use("/api/topic", topicRoute);
 app.use("/api/upload", uploadRoute);
@@ -57,7 +59,7 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-  // console.log("error: ", error.message);
+  // console.log("error: ", error);
   const message = error.message || "Error Server!";
   const statusCode = error.statusCode || 500;
   res.status(statusCode).json({

@@ -14,7 +14,6 @@ const classSchema = new Schema(
     },
     class_pass: {
       type: String,
-      required: true,
     },
     display: {
       type: Boolean,

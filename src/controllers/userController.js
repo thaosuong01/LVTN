@@ -1,6 +1,7 @@
 import { ApiError } from "../middlewares/api-error.js";
 import Account from "../models/Account.js";
 import User from "../models/User.js";
+import bcrypt from "bcrypt";
 
 export const getAllUserController = async (req, res, next) => {
   try {
@@ -15,7 +16,10 @@ export const getAllUserController = async (req, res, next) => {
       })
       .select("fullname avatar email birthday");
 
-    return res.status(200).json(getAll);
+    const excludeAdmin = getAll.filter(
+      (item) => item.role_id?.role_name !== "Admin"
+    );
+    return res.status(200).json(excludeAdmin);
   } catch (error) {
     console.log(error);
     next(new ApiError(500, error.message));
@@ -91,17 +95,6 @@ export const deleteUserController = async (req, res, next) => {
   }
 };
 
-// export const getStudent = async (req, res, next) => {
-//   try {
-//     const role_id = req.params.id;
-
-//     console.log(role_id);
-//   } catch (error) {
-//     console.log(error);
-//     next(new ApiError(500, error.message));
-//   }
-// };
-
 export const updateProfile = async (req, res, next) => {
   try {
     const id = await req.account.user_id;
@@ -163,6 +156,41 @@ export const updateUser = async (req, res, next) => {
     return res.status(200).json(userUpdate);
   } catch (error) {
     console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const createManyStudent = async (req, res, next) => {
+  try {
+    const data = req.body;
+
+    await Promise.all(
+      data.map(async (item) => {
+        const existUser = await Account.findOne({ username: item?.username });
+
+        if (existUser) {
+          throw new Error("User already exists");
+        }
+
+        const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(item?.password, salt);
+
+        const newAccount = await Account.create({
+          username: item?.username,
+          password: passwordHash,
+        });
+
+        await User.create({
+          fullname: item?.fullname,
+          email: item?.email,
+          account_id: newAccount.id,
+          role_id: "64fa8e778552d8ecf9efcbad",
+        });
+      })
+    );
+
+    return res.status(201).json("Tạo thành công");
+  } catch (error) {
     next(new ApiError(500, error.message));
   }
 };

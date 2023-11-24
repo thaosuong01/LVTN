@@ -10,16 +10,14 @@ export const createExerciseController = async (req, res, next) => {
       await req.body;
 
     // Check unique title
-    const exerciseExist = await Exercise.findOne({ title });
-    if (exerciseExist) {
-      if (file_name?.length > 0) {
-        for (const file of file_name) {
-          fs.unlink(`src/uploads/exercises/${file}`, (err) => {
-            if (err) throw err;
-          });
-        }
+    // const exerciseExist = await Exercise.findOne({ title });
+    // if (exerciseExist) {
+    if (file_name?.length > 0) {
+      for (const file of file_name) {
+        fs.unlink(`src/uploads/exercises/${file}`, (err) => {
+          if (err) throw err;
+        });
       }
-      throw new ApiError(409, "Title already exists");
     }
 
     const exercise = await Exercise.create({

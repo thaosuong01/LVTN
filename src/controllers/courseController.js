@@ -27,7 +27,6 @@ export const createCourseController = async (req, res, next) => {
 export const updateCourseController = async (req, res, next) => {
   try {
     const course_id = await req.params.id;
-    console.log('course_id: ', course_id);
 
     const { course_code, course_name, department_id } = await req.body;
 
@@ -105,6 +104,7 @@ export const getCourseByDepartmentController = async (req, res, next) => {
     next(new ApiError(500, error.message));
   }
 };
+
 
 export const deleteCourseController = async (req, res, next) => {
   try {

@@ -13,9 +13,6 @@ const userSchema = new Schema(
     email: {
       type: String,
     },
-    birthday: {
-      type: Date,
-    },
     role_id: {
       type: Schema.Types.ObjectId,
       ref: "roles",

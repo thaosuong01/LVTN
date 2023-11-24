@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  createManyStudent,
   deleteUserController,
   getAllUserController,
   getCurrentUserController,
@@ -21,5 +22,6 @@ router.delete(
   deleteUserController
 );
 router.put("/update-profile", [isAuthentication], updateProfile);
+router.post("/create-many-student", createManyStudent);
 
 export default router;

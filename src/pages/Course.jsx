@@ -3,14 +3,16 @@ import LoginIcon from "@mui/icons-material/Login";
 import { Breadcrumbs, List, ListItem, Typography } from "@mui/material";
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiGetClass } from "../api/class";
 import { apiGetCourseByID } from "../api/course";
+import { apiGetUserEnroledByClass } from "../api/enrol";
 import RightNavigate from "../components/RightNavigate";
 import { path } from "../utils/path";
 
 const Course = () => {
   const { user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
 
   const [course, setCourse] = useState({});
   const [classes, setClasses] = useState([]);
@@ -38,6 +40,25 @@ const Course = () => {
 
     getClass();
   }, [cid]);
+
+  const handleClick = async (class_id) => {
+    const response = await apiGetUserEnroledByClass(class_id);
+    const studentEnroled = response?.data;
+
+    const enrolledUsers = studentEnroled.map(
+      (enrollment) => enrollment.user_id._id
+    );
+
+    if (user?.role_id?.role_name === "Teacher") {
+      return navigate(`/${path.CLASSPAGE}/${class_id}`);
+    }
+
+    if (enrolledUsers.includes(user?._id)) {
+      navigate(`/${path.CLASSPAGE}/${class_id}`);
+    } else {
+      navigate(`/${path.ENROLMENTPAGE}/${class_id}`);
+    }
+  };
 
   const [selectedClasses, setSelectedClasses] = useState([]);
 
@@ -72,13 +93,13 @@ const Course = () => {
                     <div className="flex items-center justify-between w-full">
                       <div>
                         <LoginIcon sx={{ color: "#555", mr: 2 }} />
-                        <Link
-                          to={`/${path.CLASSPAGE}/${item._id}`}
+                        <span
+                          onClick={() => handleClick(item?._id)}
                           className="w-[80%]"
                         >
                           <span className="mr-2">{item?.class_name}</span>
                           <span>{item?.class_code}</span>
-                        </Link>
+                        </span>
                       </div>
                       <div>
                         <InfoOutlinedIcon

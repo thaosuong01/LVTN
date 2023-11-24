@@ -7,6 +7,7 @@ import { useDropzone } from "react-dropzone";
 import { fSlug, renameFile } from "../utils/file";
 import { apiCreateExerciseSubmit } from "../api/exerciseSubmit";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
 
 const style = {
   position: "absolute",
@@ -58,6 +59,7 @@ const ModalSubmitExercise = ({
   };
 
   const handleUploadFiles = async (e) => {
+    if (files.length === 0) return;
     e.preventDefault();
     try {
       const formData = new FormData();
@@ -67,8 +69,10 @@ const ModalSubmitExercise = ({
 
       formData.append("student_id", student_id);
       formData.append("exercise_id", pid);
+      formData.append("time_submit", dayjs(Date.now()));
 
       const response = await apiCreateExerciseSubmit(formData);
+      console.log("response: ", response);
       if (response?.status === 201) {
         handleClose();
         setFiles([]);

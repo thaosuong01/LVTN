@@ -1,4 +1,4 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -11,7 +11,9 @@ import { apiGetExerciseById } from "../api/exercise";
 import { apiGetAllExerciseSubmitByExerciseId } from "../api/exerciseSubmit";
 import ModalEditSubmitExercise from "../components/ModalEditSubmitExercise";
 import ModalSubmitExercise from "../components/ModalSubmitExercise";
+import ModalGrading from "../components/ModalGrading";
 import RightNavigate from "../components/RightNavigate";
+import CreateIcon from "@mui/icons-material/Create";
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -20,6 +22,7 @@ const PracticePage = () => {
   const { user } = useSelector((state) => state.user);
   const { pid } = useParams();
   const [exercise, setExercise] = useState({});
+  console.log("exercise: ", dayjs(exercise?.start_time) < Date.now());
   const [exerciseSubmit, setExerciseSubmit] = useState([]);
 
   const [openModalSubmit, setOpenModalSubmit] = useState(false);
@@ -49,6 +52,7 @@ const PracticePage = () => {
   }, [pid]);
 
   const [exerciseOfStudent, setExerciseOfStudent] = useState({});
+
   useEffect(() => {
     setExerciseOfStudent(
       exerciseSubmit.filter(
@@ -64,7 +68,8 @@ const PracticePage = () => {
   const handleCloseModalSubmit = () => {
     setOpenModalSubmit(false);
   };
-  const handleOpenModalEditSubmit = () => {
+  const handleOpenModalEditSubmit = (id) => {
+    console.log("id: ", id);
     setOpenModalEditSubmit(true);
   };
 
@@ -74,7 +79,7 @@ const PracticePage = () => {
 
   const remainingTime = (exercise) => {
     const deadline = dayjs(exercise.deadline);
-    const currentTime = dayjs();
+    const currentTime = dayjs(exerciseOfStudent?.time_submit);
     const remainingTime = dayjs.duration(deadline.diff(currentTime));
     let formattedTime;
     if (currentTime.isAfter(deadline)) {
@@ -88,34 +93,86 @@ const PracticePage = () => {
     return formattedTime;
   };
 
+  const getStatus = (data) => {
+    const deadline = dayjs(exercise.deadline);
+    const time_submit = dayjs(data.time_submit);
+    let status;
+
+    if (time_submit.isAfter(deadline)) {
+      status = "Nộp muộn";
+    } else {
+      status = "Đã nộp";
+    }
+    exerciseSubmit?.map((submit) => {
+      if (submit?.grade) {
+        status = "Đã chấm điểm";
+      }
+    });
+    return status;
+  };
+
+  const actionLink = (params) => {
+    return (
+      <Link
+        to={`${import.meta.env.VITE_SERVER_URL}/exercise-submit/${
+          params?.value
+        }`}
+      >
+        {params?.value}
+      </Link>
+    );
+  };
+
+  const actionButton = (params) => (
+    <Button onClick={() => handleOpenModalGrading(params.row._id)}>
+      <CreateIcon className="text-primary" />
+    </Button>
+  );
+
+  const [openModalGrading, setOpenModalGrading] = useState(false);
+  const [exerciseId, setExerciseId] = useState([]);
+
+  const handleOpenModalGrading = (id) => {
+    setExerciseId(id);
+    setOpenModalGrading(true);
+  };
+
+  const handleCloseModalGrading = () => {
+    setOpenModalGrading(false);
+  };
+
   const columns = [
     {
       field: "fullname",
       headerName: "Full Name",
-      width: 150,
-      valueGetter: (params) => params.row.student_id?.fullname,
-    },
-    {
-      field: "username",
-      headerName: "Username",
-      width: 120,
-      valueGetter: (params) => params.row.student_id?.account_id?.username,
-    },
-    {
-      field: "student_id",
-      headerName: "Email",
-      width: 200,
-      valueGetter: (params) => params.row.student_id?.email,
+      width: 280,
+      valueGetter: (params) =>
+        params.row.student_id?.fullname +
+        " " +
+        params.row.student_id?.account_id?.username,
     },
     {
       field: "files",
       headerName: "Files",
-      width: 350,
+      width: 400,
+      renderCell: actionLink,
     },
     {
       field: "status",
       headerName: "Status",
-      width: 100,
+      width: 150,
+      valueGetter: (params) => {
+        const data = params.row;
+        return getStatus(data);
+      },
+    },
+    {
+      field: "action",
+      headerName: "Grading",
+      sortable: false,
+      filterable: false,
+      width: 120,
+      renderCell: actionButton,
     },
   ];
 
@@ -126,13 +183,15 @@ const PracticePage = () => {
           <div className="w-[80%]">
             {user?.role_id?.role_name === "Student" && (
               <div>
-                <Typography
-                  sx={{ fontSize: "24px", fontWeight: "bold", mb: 4 }}
-                >
+                <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
                   Trạng thái nộp
                 </Typography>
+                <div className="flex justify-end font-bold text-xl">
+                  <span>{exerciseOfStudent?.grade}</span>
+                  <span>/10</span>
+                </div>
                 <div className="my-4 border">
-                  <div className="flex bg-slate-200 p-2">
+                  <div className="flex p-2">
                     <Typography className="w-[30%]">Trạng thái nộp</Typography>
                     <span className="w-[70%]">
                       {exerciseOfStudent?.files?.length > 0
@@ -140,12 +199,28 @@ const PracticePage = () => {
                         : "Nothing has been sumitted for this assignment"}
                     </span>
                   </div>
+                  <div className="flex p-2 bg-slate-200 ">
+                    <Typography className="w-[30%]">Đề</Typography>
+                    <div className="w-[70%] flex flex-col">
+                      {exercise?.files?.map((file, index) => (
+                        <Link
+                          className="w-full hover:text-hover"
+                          to={`${
+                            import.meta.env.VITE_SERVER_URL
+                          }/exercise-submit/${file}`}
+                          key={index}
+                        >
+                          {file}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex p-2">
                     <Typography className="w-[30%]">
                       Tình trạng chấm điểm
                     </Typography>
                     <span className="w-[70%]">
-                      {exerciseOfStudent?.exercise_score ?? "Chưa chấm điểm"}
+                      {"Đã chấm điểm" ?? "Chưa chấm điểm"}
                     </span>
                   </div>
                   <div className="flex bg-slate-200 p-2">
@@ -166,9 +241,9 @@ const PracticePage = () => {
                     <Typography className="w-[30%]">
                       Sửa đổi lần cuối
                     </Typography>
-                    {exerciseOfStudent?.updatedAt ? (
+                    {exerciseOfStudent?.time_submit ? (
                       <span className="w-[70%]">
-                        {dayjs(exerciseOfStudent?.updatedAt).format(
+                        {dayjs(exerciseOfStudent?.time_submit).format(
                           "dddd, DD MMMM YYYY, hh:mm A"
                         )}
                       </span>
@@ -181,7 +256,7 @@ const PracticePage = () => {
                     <div className="w-[70%] flex flex-col">
                       {exerciseOfStudent?.files?.map((file, index) => (
                         <Link
-                          className="w-full"
+                          className="w-full hover:text-hover"
                           to={`${
                             import.meta.env.VITE_SERVER_URL
                           }/exercise-submit/${file}`}
@@ -192,25 +267,37 @@ const PracticePage = () => {
                       ))}
                     </div>
                   </div>
+                  <div className="flex bg-slate-200 p-2">
+                    <Typography className="w-[30%]">Nhận xét</Typography>
+                    <span className="w-[70%]">
+                      {exerciseOfStudent?.comment ?? "-"}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex justify-center">
                   {exerciseOfStudent ? (
                     <button
-                      onClick={() => handleOpenModalEditSubmit()}
+                      onClick={() =>
+                        handleOpenModalEditSubmit(exerciseOfStudent?._id)
+                      }
                       type="submit"
                       className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-2"
                     >
                       Chỉnh sửa
                     </button>
                   ) : (
-                    <button
-                      onClick={() => handleOpenModalSubmit()}
-                      type="submit"
-                      className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-2"
-                    >
-                      Nộp bài
-                    </button>
+                    <>
+                      {dayjs(exercise?.start_time) < Date.now() && (
+                        <button
+                          onClick={() => handleOpenModalSubmit()}
+                          type="submit"
+                          className="bg-button text-white hover:bg-[#5b9608] transition-all ease-in-out duration-150 p-2"
+                        >
+                          Nộp bài
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -253,6 +340,11 @@ const PracticePage = () => {
                       slotProps={{
                         toolbar: {
                           showQuickFilter: true,
+                          csvOptions: {
+                            utf8WithBom: true,
+                            fileName: "Danh-sach-ket-qua",
+                            delimiter: ",",
+                          },
                         },
                       }}
                       getRowId={(exerciseSubmit) => exerciseSubmit._id}
@@ -304,8 +396,18 @@ const PracticePage = () => {
           fetchExerciseSubmits={fetchExerciseSubmits}
           open={openModalEditSubmit}
           student_id={user?._id}
+          exerciseOfStudent={exerciseOfStudent}
           pid={pid}
           handleClose={handleCloseModalEditSubmit}
+        />
+      )}
+
+      {openModalGrading && (
+        <ModalGrading
+          open={openModalGrading}
+          pid={pid}
+          exerciseId={exerciseId}
+          handleClose={handleCloseModalGrading}
         />
       )}
     </>

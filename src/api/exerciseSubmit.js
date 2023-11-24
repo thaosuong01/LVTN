@@ -23,10 +23,25 @@ export const apiGetExerciseSubmitByStudentId = async (sid) => {
   });
 };
 
+export const apiGetExerciseSubmitById = async (id) => {
+  return instance({
+    method: "GET",
+    url: `/api/exercise-submit/get-by-id/${id}`,
+  });
+};
+
 export const apiUpdateExerciseSubmitById = async (eid, data) => {
   return instance({
     method: "PUT",
     url: `/api/exercise-submit/update/${eid}`,
+    data,
+  });
+};
+
+export const apiGradeAndComment = async (eid, data) => {
+  return instance({
+    method: "PUT",
+    url: `/api/exercise-submit/grade-and-comment/${eid}`,
     data,
   });
 };

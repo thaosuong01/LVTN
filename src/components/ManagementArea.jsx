@@ -1,6 +1,5 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Collapse, List, ListItemButton, Typography } from "@mui/material";
@@ -12,16 +11,10 @@ import { path } from "../utils/path";
 const data = [
   {
     label: "Quản trị khóa học",
-    path: "/ktmt",
     children: [
       {
         childLabel: "Chỉnh sửa các khóa học",
-        path: path,
-        icon: SettingsIcon,
-      },
-      {
-        childLabel: "Hoàn thành khóa học",
-        path: "/cntt",
+        path: `/${path.LISTDEPARTMENT}`,
         icon: SettingsIcon,
       },
     ],
@@ -29,17 +22,11 @@ const data = [
 
   {
     label: "Thành viên",
-    path: "/ktmt",
     children: [
       {
         childLabel: "Người dùng đã ghi danh",
-        path: "/item4-1",
+        path: `/${path.LISTCOURSEOFTEACHER}`,
         icon: PersonIcon,
-      },
-      {
-        childLabel: "Phương thức ghi danh",
-        path: "/item4-2",
-        icon: LockOpenIcon,
       },
     ],
   },
@@ -101,7 +88,7 @@ const ManagementArea = () => {
                       <ListItemButton
                         key={childIndex}
                         component={Link}
-                        to={`/${path.LISTDEPARTMENT}`}
+                        to={child.path}
                         sx={{ pl: 2 }}
                       >
                         {child.icon && (

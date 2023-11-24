@@ -30,6 +30,7 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
+    localStorage.removeItem("editingMode");
     window.location.href = "/login";
   };
 

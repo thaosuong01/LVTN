@@ -80,6 +80,7 @@ const ListDocument = () => {
   };
 
   const { user } = useSelector((state) => state.user);
+  console.log("user: ", user);
 
   const { cid } = useParams();
 
@@ -347,44 +348,49 @@ const ListDocument = () => {
 
               {exercises.map((ex) => {
                 if (ex.topic_id === topic?._id) {
-                  return (
-                    <List key={ex._id}>
-                      <ListItem disablePadding>
-                        <div className="flex justify-between w-full">
-                          <div className="flex gap-4 w-[80%] items-center">
-                            <img
-                              src="/../src/assets/icons/practice.png"
-                              alt="Folder"
-                              width={40}
-                            />
-                            <Link to={`/${path.PRACTICEPAGE}/${ex._id}`}>
-                              {ex.title}
-                            </Link>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-end items-center w-[20%]  cursor-pointer">
-                          <Checkbox />
-                          {editMode ? (
-                            <div className="flex gap-2">
-                              <Link
-                                to={`/${path.UPDATEPRACTICE}/${ex?._id}`}
-                                className="text-sm text-primary hover:text-hover"
-                              >
-                                Chỉnh sửa
+                  if (
+                    classes?.owner === user?._id ||
+                    user?.role_id?.role_name === "Student"
+                  ) {
+                    return (
+                      <List key={ex._id}>
+                        <ListItem disablePadding>
+                          <div className="flex justify-between w-full">
+                            <div className="flex gap-4 w-[80%] items-center">
+                              <img
+                                src="/../src/assets/icons/practice.png"
+                                alt="Folder"
+                                width={40}
+                              />
+                              <Link to={`/${path.PRACTICEPAGE}/${ex._id}`}>
+                                {ex.title}
                               </Link>
-                              <span
-                                className="text-primary text-sm hover:text-hover"
-                                onClick={() => handleDeleteExercise(ex._id)}
-                              >
-                                Xóa
-                              </span>
                             </div>
-                          ) : null}
-                        </div>
-                      </ListItem>
-                    </List>
-                  );
+                          </div>
+
+                          <div className="flex justify-end items-center w-[20%]  cursor-pointer">
+                            <Checkbox />
+                            {editMode ? (
+                              <div className="flex gap-2">
+                                <Link
+                                  to={`/${path.UPDATEPRACTICE}/${ex?._id}`}
+                                  className="text-sm text-primary hover:text-hover"
+                                >
+                                  Chỉnh sửa
+                                </Link>
+                                <span
+                                  className="text-primary text-sm hover:text-hover"
+                                  onClick={() => handleDeleteExercise(ex._id)}
+                                >
+                                  Xóa
+                                </span>
+                              </div>
+                            ) : null}
+                          </div>
+                        </ListItem>
+                      </List>
+                    );
+                  }
                 }
               })}
             </Fragment>

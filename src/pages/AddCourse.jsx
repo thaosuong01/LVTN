@@ -49,15 +49,15 @@ const AddCourse = () => {
   };
 
   const validationSchema = Yup.object().shape({
-    class_name: Yup.string().required("Vui lòng nhập tên khóa học"),
-    class_code: Yup.string().required("Vui lòng nhập mã số ID khóa học"),
-    display: Yup.string().required("Vui lòng chọn hiển thị khóa học"),
+    class_name: Yup.string().required("Vui lòng nhập tên lớp học"),
+    class_code: Yup.string().required("Vui lòng nhập mã lớp học"),
+    display: Yup.string().required("Vui lòng chọn hiển thị lớp học"),
     department: Yup.string().required("Vui lòng chọn khoa"),
     course_id: Yup.string().required("Vui lòng chọn khóa học"),
   });
 
   const handleAdd = async (values) => {
-    console.log("values: ", values);
+    
     try {
       const response = await apiAddClass(values);
 
@@ -74,7 +74,7 @@ const AddCourse = () => {
         text: error?.response?.data?.message ?? error?.message,
         confirmButtonColor: "#ffae00",
       });
-      console.log(error);
+      
     }
   };
 
@@ -91,7 +91,7 @@ const AddCourse = () => {
                 className="flex justify-center"
                 sx={{ fontWeight: "bold" }}
               >
-                Thêm khóa học
+                Thêm mới lớp học
               </Typography>
             </div>
             <Formik
@@ -105,7 +105,7 @@ const AddCourse = () => {
                 return (
                   <form onSubmit={handleSubmit}>
                     <div className="flex justify-center items-center my-2">
-                      <InputLabel className="w-[30%]">Tên khóa học</InputLabel>
+                      <InputLabel className="w-[30%]">Tên lớp học</InputLabel>
                       <div className="w-[70%]">
                         <TextField
                           name="class_name"
@@ -132,7 +132,7 @@ const AddCourse = () => {
 
                     <div className="flex justify-center items-center my-2">
                       <InputLabel className="w-[30%]">
-                        Mã số ID khóa học
+                        Mã lớp học
                       </InputLabel>
                       <div className="w-[70%]">
                         <TextField
@@ -255,7 +255,7 @@ const AddCourse = () => {
 
                     <div className="flex justify-center items-center my-2">
                       <InputLabel className="w-[30%]">
-                        Hiển thị khóa học
+                        Hiển thị lớp học
                       </InputLabel>
                       <div className="w-[70%] flex flex-col">
                         <Select
@@ -285,10 +285,10 @@ const AddCourse = () => {
                       </div>
                     </div>
 
-                    <div className="my-4">
+                    <div className="my-4 w-full flex justify-center items-center">
                       <Button
                         type="submit"
-                        fullWidth
+                        className="w-[30%]"
                         sx={{
                           backgroundColor: "#ffae00",
                           "&:hover": { backgroundColor: "#ff9500" },

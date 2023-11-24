@@ -1,17 +1,15 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 
-import { Formik } from "formik";
 import { default as React, useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { fSlug, renameFile } from "../utils/file";
+import Swal from "sweetalert2";
 import {
-  apiCreateExerciseSubmit,
-  apiGetAllExerciseSubmitByExerciseId,
   apiGetExerciseSubmitByStudentId,
   apiUpdateExerciseSubmitById,
 } from "../api/exerciseSubmit";
-import Swal from "sweetalert2";
+import { fSlug, renameFile } from "../utils/file";
+import dayjs from "dayjs";
 
 const style = {
   position: "absolute",
@@ -33,8 +31,8 @@ const ModalEditSubmitExercise = ({
   pid,
   student_id,
   fetchExerciseSubmits,
+  exerciseOfStudent,
 }) => {
-  console.log("pid: ", pid);
   const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
@@ -73,13 +71,7 @@ const ModalEditSubmitExercise = ({
   const [values, setvalues] = useState({});
   console.log("values: ", values);
 
-  // Fetch exercise submit by student id
-  const fetchExerciseSubmitdetail = async (student_id) => {
-    const response = await apiGetExerciseSubmitByStudentId(student_id);
-    if (response.status === 200) {
-      setvalues(response?.data[0]);
-    }
-  };
+
 
   useEffect(() => {
     fetchExerciseSubmits(pid);
@@ -87,7 +79,7 @@ const ModalEditSubmitExercise = ({
 
   useEffect(() => {
     if (student_id) {
-      fetchExerciseSubmitdetail(student_id);
+      setvalues(exerciseOfStudent);
     }
   }, [student_id, open]);
 
@@ -100,6 +92,7 @@ const ModalEditSubmitExercise = ({
       });
 
       formData.append("newFiles", values?.files);
+      formData.append("time_submit", dayjs(Date.now()));
 
       const response = await apiUpdateExerciseSubmitById(values?._id, formData);
       if (response?.status === 200) {

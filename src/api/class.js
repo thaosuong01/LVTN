@@ -11,6 +11,17 @@ export const apiGetClass = async (cid) => {
   }
 };
 
+export const apiGetClassCreatedByOwner = async () => {
+  try {
+    return instance({
+      method: "GET",
+      url: `/api/class/get-class-created-by-owner/`,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const apiGetClassById = async (cid) => {
   try {
     return instance({
@@ -52,5 +63,3 @@ export const deleteClass = async (id) => {
     url: `/api/class/delete-class/${id}`,
   });
 };
-
-

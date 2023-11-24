@@ -40,7 +40,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
     display: "",
     course_id: "",
   });
-  console.log("initialValues: ", initialValues);
+  
 
   const fetchClassById = async () => {
     try {
@@ -58,7 +58,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
   }, [classId]);
 
   const [courses, setCourses] = useState([]);
-  console.log("courses: ", courses);
+  
   const { did } = useParams();
 
   const fetchCourse = async () => {
@@ -73,9 +73,9 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
   }, [did]);
 
   const validationSchema = Yup.object().shape({
-    class_name: Yup.string().required("Vui lòng nhập tên khóa học"),
-    class_code: Yup.string().required("Vui lòng nhập mã số ID khóa học"),
-    display: Yup.string().required("Vui lòng chọn hiển thị khóa học"),
+    class_name: Yup.string().required("Vui lòng nhập tên lớp học"),
+    class_code: Yup.string().required("Vui lòng nhập mã lớp học"),
+    display: Yup.string().required("Vui lòng chọn hiển thị lớp học"),
   });
 
   const onSubmit = async (values) => {
@@ -94,7 +94,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
         text: error?.response?.data?.message ?? error?.message,
         confirmButtonColor: "#ffae00",
       });
-      console.log(error);
+      
     }
   };
 
@@ -131,7 +131,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
                   className="w-[70%]"
                   sx={{ fontWeight: "bold" }}
                 >
-                  Chỉnh sửa thông tin khóa học
+                  Chỉnh sửa thông tin lớp học
                 </Typography>
               </div>
             </div>
@@ -145,13 +145,11 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
                 onSubmit={onSubmit}
               >
                 {({ values, handleSubmit, handleChange, errors }) => {
-                  console.log("errors: ", errors);
+                  
                   return (
                     <form onSubmit={handleSubmit}>
                       <div className="flex justify-center items-center my-2">
-                        <InputLabel className="w-[30%]">
-                          Tên khóa học
-                        </InputLabel>
+                        <InputLabel className="w-[30%]">Tên lớp học</InputLabel>
                         <div className="w-[70%]">
                           <TextField
                             name="class_name"
@@ -178,7 +176,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
 
                       <div className="flex justify-center items-center my-2">
                         <InputLabel className="w-[30%]">
-                          Mã số ID khóa học
+                          Mã số lớp học
                         </InputLabel>
                         <div className="w-[70%]">
                           <TextField
@@ -201,32 +199,6 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
                               className=""
                             >
                               {errors.class_code}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex justify-center items-center my-2">
-                        <InputLabel className="w-[30%]">Mật khẩu</InputLabel>
-                        <div className="w-[70%]">
-                          <TextField
-                            name="class_pass"
-                            variant="outlined"
-                            fullWidth
-                            value={values?.class_pass || ""}
-                            onChange={handleChange}
-                            error={Boolean(errors.class_pass)}
-                          />
-                          {errors.class_pass && (
-                            <span
-                              style={{
-                                color: "red",
-                                textAlign: "left",
-                                width: "90%",
-                              }}
-                              className=""
-                            >
-                              {errors.class_pass}
                             </span>
                           )}
                         </div>
@@ -267,7 +239,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
 
                       <div className="flex justify-center items-center my-2">
                         <InputLabel className="w-[30%]">
-                          Hiển thị khóa học
+                          Hiển thị lớp học
                         </InputLabel>
                         <div className="w-[70%] flex flex-col">
                           <Select

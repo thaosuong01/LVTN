@@ -125,7 +125,7 @@ const ModalAddTopic = ({ handleClose, classId, open, setTopics }) => {
                     <form onSubmit={handleSubmit}>
                       <div className="flex justify-center items-center my-2">
                         <InputLabel className="w-[30%]">
-                          Tên khóa học
+                          Tên tiêu đề
                         </InputLabel>
                         <div className="w-[70%]">
                           <TextField

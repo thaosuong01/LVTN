@@ -1,51 +1,115 @@
-import ClearIcon from "@mui/icons-material/Clear";
-import SettingsIcon from "@mui/icons-material/Settings";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import React, { Fragment, useState } from "react";
+import { Clear } from "@mui/icons-material";
+import { Box, Breadcrumbs, Button, Container, Typography } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
+import { apiGetClassById } from "../api/class";
+import {
+  apiDeleteStudentEnroled,
+  apiGetUserEnroledByClass,
+} from "../api/enrol";
 import RightNavigate from "../components/RightNavigate";
-
-const rows = [
-  {
-    fullname: "Demo",
-    username: "demo",
-    email: "demo@gmail.com",
-    maso: "123",
-    role: "Sinh viên",
-    lastvisit: "2 ngày trước",
-  },
-  {
-    fullname: "Giáo Viên",
-    username: "teacher",
-    email: "teacher@gmail.com",
-    maso: "00023",
-    role: "Giáo viên",
-    lastvisit: "2 phút trước",
-  },
-  {
-    fullname: "Sinh viên",
-    username: "demo",
-    email: "demo@gmail.com",
-    maso: "123",
-    role: "Sinh viên",
-    lastvisit: "2 ngày trước",
-  },
-];
+import { apiGetCourseByID } from "../api/course";
+import { path } from "../utils/path";
 
 const UserEnroled = () => {
-  const [activeIconIndex, setActiveIconIndex] = useState([]);
+  const actionButton = (params) => (
+    <Button onClick={() => handleDelete(params.row._id)}>
+      <Clear className="text-primary" />
+    </Button>
+  );
 
-  const handleClick = (index) => {
-    if (activeIconIndex.includes(index)) {
-      setActiveIconIndex(activeIconIndex.filter((i) => i !== index));
-    } else {
-      setActiveIconIndex([...activeIconIndex, index]);
+  const columns = [
+    {
+      field: "fullname",
+      headerName: "Full Name",
+      width: 280,
+      valueGetter: (params) => params.row.user_id?.fullname,
+    },
+    {
+      field: "username",
+      headerName: "Username",
+      width: 220,
+      valueGetter: (params) => params.row.user_id?.account_id?.username,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 280,
+      valueGetter: (params) => params.row.user_id?.email,
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      sortable: false,
+      filterable: false,
+      width: 180,
+      renderCell: actionButton,
+    },
+  ];
+
+  const { cid } = useParams();
+
+  const [classes, setClasses] = useState();
+  console.log("classes: ", classes);
+
+  useEffect(() => {
+    async function getClass() {
+      const response = await apiGetClassById(cid);
+      setClasses(response?.data);
     }
+
+    getClass();
+  }, [cid]);
+
+  const [course, setCourse] = useState();
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const response = await apiGetCourseByID(classes?.course_id?._id);
+        setCourse(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCourse();
+  }, [classes?.course_id?._id]);
+
+  const [userEnrol, setUserEnrol] = useState([]);
+
+  const fetchUserEnroledById = async () => {
+    const response = await apiGetUserEnroledByClass(cid);
+    setUserEnrol(response?.data);
+  };
+
+  useEffect(() => {
+    fetchUserEnroledById();
+  }, [cid]);
+
+  const handleDelete = (eid) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffae00",
+      cancelButtonColor: "#90c446",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await apiDeleteStudentEnroled(eid);
+
+          Swal.fire("Deleted!", "The student has been deleted.", "success");
+          fetchUserEnroledById();
+        } catch (error) {
+          Swal.fire("Fail!", "Delete fail", "error");
+        }
+      }
+    });
   };
 
   return (
@@ -53,80 +117,83 @@ const UserEnroled = () => {
       <div className="bg-white py-8">
         <div className="flex gap-8 px-5">
           <div className="w-[80%]">
-            <TableContainer component={Paper}>
-              <Table
-                sx={{ minWidth: 650, border: "solid 1px #ddd" }}
-                aria-label="simple table"
+            <div className="mb-4 px-6">
+              <Breadcrumbs aria-label="breadcrumb">
+                <Link
+                  className="text-second hover:text-black text-sm"
+                  to={`/${path?.LISTDEPARTMENT}`}
+                >
+                  {course?.department_id?.department_name}
+                </Link>
+                <Link
+                  className="text-second hover:text-black text-sm"
+                  to={`/${path?.COURSE}/${course?._id}`}
+                >
+                  {course?.course_name}
+                </Link>
+                <Typography sx={{ fontSize: "14px" }} color="text.primary">
+                  {classes?.class_name + " " + classes?.class_code}
+                </Typography>
+              </Breadcrumbs>
+              <Box
+                display={"flex"}
+                justifyContent={"space-between"}
+                marginBottom={2}
+                paddingTop={4}
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "bold" }}>Họ và tên</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Tên đăng nhập
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Địa chỉ email
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Mã số
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Vai trò
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Lần truy cập cuối vào khóa học
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Trạng thái
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        align="center"
-                        className="flex-col"
-                      >
-                        <img
-                          src="../../src/assets/Logo.jpg"
-                          alt=""
-                          className="w-16 mx-auto"
-                        />
-                        <span>{row.fullname}</span>
-                      </TableCell>
-                      <TableCell align="center">{row.username}</TableCell>
-                      <TableCell align="center">{row.email}</TableCell>
-                      <TableCell align="center">{row.maso}</TableCell>
-                      <TableCell align="center">{row.role}</TableCell>
-                      <TableCell align="center">{row.lastvisit}</TableCell>
-                      <TableCell align="right">
-                        <span className="flex gap-4 justify-center text-second">
-                          <Fragment>
-                            <SettingsIcon
-                              sx={{
-                                fontSize: "20px",
-                                cursor: "pointer",
-                                "&:hover": { color: "#ffae00" },
-                              }}
-                            />
-                            <ClearIcon
-                              sx={{
-                                fontSize: "20px",
-                                cursor: "pointer",
-                                "&:hover": { color: "#ffae00" },
-                              }}
-                            />
-                          </Fragment>
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                <Typography variant="h6" color="initial" fontWeight={"bold"}>
+                  Người dùng đã ghi danh
+                </Typography>
+              </Box>
+            </div>
+            <Container maxWidth={"lg"}>
+              <Box sx={{ height: 430, width: "100%" }}>
+                <DataGrid
+                  checkboxSelection
+                  rows={userEnrol}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: {
+                        pageSize: 5,
+                      },
+                    },
+                  }}
+                  slots={{ toolbar: GridToolbar }}
+                  slotProps={{
+                    toolbar: {
+                      showQuickFilter: true,
+                      csvOptions: {
+                        utf8WithBom: true,
+                        fileName: "Danh-sach-ket-qua",
+                        delimiter: ",",
+                      },
+                    },
+                  }}
+                  getRowId={(userEnrol) => userEnrol._id}
+                  pageSizeOptions={[5]}
+                  sx={{
+                    "& div div div div div .MuiDataGrid-withBorderColor": {
+                      borderBottomColor: "#ccc",
+                    },
+                    "& div .MuiDataGrid-columnHeaders": {
+                      borderColor: "#ccc",
+                    },
+                    // Table head
+                    "& div div div div div div div div .MuiDataGrid-columnHeaderTitle":
+                      {
+                        fontWeight: "700",
+                        textTransform: "uppercase",
+                      },
+
+                    borderColor: "#ccc",
+                    boxShadow: "1px 1px 5px 1px #ddd",
+                    borderRadius: "5px",
+                    fontSize: "14px",
+                  }}
+                />
+              </Box>
+            </Container>
           </div>
           <div className="w-[20%]">
             <RightNavigate></RightNavigate>

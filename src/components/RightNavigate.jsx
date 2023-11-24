@@ -2,15 +2,39 @@ import HubIcon from "@mui/icons-material/Hub";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import { Box, CardContent, Stack, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import ListNavigationHome from "./ListNavigationHome";
 import ManagementArea from "./ManagementArea";
+import { apiGetClassEnrolOfStudent } from "../api/enrol";
+import { apiGetClassCreatedByOwner } from "../api/class";
 
 const RightNavigate = () => {
   const { user } = useSelector((state) => state.user);
   const { departments } = useSelector((state) => state.department);
+
+  const [listClass, setListClass] = useState([]);
+  console.log('listClass: ', listClass);
+
+  const getClassEnrolOfStudent = async () => {
+    const response = await apiGetClassEnrolOfStudent(user?._id);
+    setListClass(response?.data);
+  };
+
+  useEffect(() => {
+    getClassEnrolOfStudent();
+  }, [user?._id]);
+
+
+  const getClassByOwner = async () => {
+    const response = await apiGetClassCreatedByOwner();
+    setListClass(response?.data);
+  };
+
+  useEffect(() => {
+    getClassByOwner();
+  }, [user?._id]);
 
   return (
     <>
@@ -60,6 +84,11 @@ const RightNavigate = () => {
                   label: "All Courses",
                   pathData: "/",
                   children: departments,
+                },
+                {
+                  label: "My Classes",
+                  pathData: "/",
+                  children: listClass,
                 },
               ]}
             />

@@ -149,7 +149,7 @@ const ManageCourse = () => {
                 to={`/${path.ADDCOURSE}`}
                 className="bg-button hover:bg-[#5b9608] text-white p-2 transition-all ease-in-out duration-150"
               >
-                Tạo khóa học mới
+                Tạo lớp học mới
               </Link>
             </div>
             <div className="flex justify-center my-8">

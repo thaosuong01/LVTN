@@ -46,7 +46,7 @@ const AuthLogin = () => {
   };
 
   useEffect(() => {
-    document.title = 'Login - Galaxy Cinema';
+    document.title = 'Login';
 
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
@@ -92,7 +92,7 @@ const AuthLogin = () => {
           }
         }}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+        {({ errors, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -103,7 +103,6 @@ const AuthLogin = () => {
                     type="text"
                     value={values.username}
                     name="username"
-                    onBlur={handleBlur}
                     onChange={handleChange}
                     placeholder="Enter username"
                     fullWidth
@@ -126,7 +125,6 @@ const AuthLogin = () => {
                     type={showPassword ? 'text' : 'password'}
                     value={values.password}
                     name="password"
-                    onBlur={handleBlur}
                     onChange={handleChange}
                     endAdornment={
                       <InputAdornment position="end">

@@ -13,6 +13,8 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 
 // render - user
 const User = Loadable(lazy(() => import('pages/user/User')));
+const Teacher = Loadable(lazy(() => import('pages/user/Teacher')));
+const Student = Loadable(lazy(() => import('pages/user/Student')));
 const UserAdd = Loadable(lazy(() => import('pages/user/UserAdd')));
 const UserEdit = Loadable(lazy(() => import('pages/user/UserEdit')));
 
@@ -33,6 +35,9 @@ const CourseEdit = Loadable(lazy(() => import('pages/course/CourseEdit')));
 
 // render - class
 const Class = Loadable(lazy(() => import('pages/class/Class')));
+
+// render - document
+const Document = Loadable(lazy(() => import('pages/document/Document')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -60,6 +65,14 @@ const MainRoutes = {
         {
           index: true,
           element: <User />
+        },
+        {
+          path: Path.Teacher,
+          element: <Teacher />
+        },
+        {
+          path: Path.Student,
+          element: <Student />
         },
         {
           path: Path.UserAdd,
@@ -128,7 +141,16 @@ const MainRoutes = {
         {
           index: true,
           element: <Class />
-        },
+        }
+      ]
+    },
+    {
+      path: 'document',
+      children: [
+        {
+          index: true,
+          element: <Document />
+        }
       ]
     }
   ]

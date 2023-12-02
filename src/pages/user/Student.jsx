@@ -1,13 +1,28 @@
 import { AddCircleOutlined, Clear, EditOutlined } from '@mui/icons-material';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Button, Container, Typography, styled } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiDeleteUser, apiGetListUser } from 'apis/user';
+import { apiCreateManyStudent, apiDeleteUser, apiGetListUser } from 'apis/user';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Papa from 'papaparse';
 
-const User = () => {
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1
+});
+
+const Student = () => {
   const actionButton = (params) => (
     <div className="flex gap-4">
       <Button LinkComponent={Link} to={`${Path.UserEdit}/${params.row._id}`} variant="contained" className="bg-primary hover:bg-hover">
@@ -35,12 +50,6 @@ const User = () => {
       field: 'email',
       headerName: 'Email',
       width: 260
-    },
-    {
-      field: 'role_id',
-      headerName: 'Role',
-      width: 160,
-      valueGetter: (params) => params.row.role_id?.role_name
     },
     {
       field: 'action',
@@ -75,13 +84,15 @@ const User = () => {
     });
   };
   const [users, setUsers] = useState([]);
+  const [fileKey, setFileKey] = useState(0);
 
-  document.title = 'Người dùng';
+  document.title = 'Danh sách sinh viên';
 
   const fetchUser = async () => {
     try {
       const response = await apiGetListUser();
-      setUsers(response?.data);
+      // console.log('response?.data: ', response?.data);
+      setUsers(response?.data?.filter((item) => item?.role_id?.role_name === 'Student'));
     } catch (error) {
       console.log('Failed to fetch user list: ', error);
     }
@@ -90,22 +101,82 @@ const User = () => {
     fetchUser();
   }, []);
 
+  const HandleImportCSV = (e) => {
+    console.log('e: ', e.target.files[0]);
+    if (e.target && e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      //Check type file
+      if (file.type !== 'text/csv') {
+        Swal.fire({ text: 'Chỉ chấp nhận file csv!' });
+        return;
+      }
+      Papa.parse(file, {
+        // header: true,
+        complete: async function (result) {
+          let rawCSV = result.data;
+          if (rawCSV.length > 0) {
+            if (rawCSV[0] && rawCSV[0].length === 4) {
+              if (rawCSV[0][0] !== 'fullname' || rawCSV[0][1] !== 'username' || rawCSV[0][2] !== 'email' || rawCSV[0][3] !== 'password') {
+                Swal.fire({ text: 'Lỗi định dạng tiêu đề trong file csv' });
+              } else {
+                let result = [];
+                rawCSV.map((item, index) => {
+                  if (index > 0 && item.length === 4) {
+                    let obj = {};
+                    obj.fullname = item[0];
+                    obj.username = item[1];
+                    obj.email = item[2];
+                    obj.password = item[3];
+                    result.push(obj);
+                  }
+                });
+
+                try {
+                  const response = await apiCreateManyStudent(result);
+                  console.log('response: ', response);
+                  if (response.status === 201) {
+                    Swal.fire({ text: 'Tạo sinh viên thành công' });
+                    fetchUser();
+                    setFileKey(fileKey + 1);
+                  }
+                } catch (error) {
+                  console.log('error: ', error);
+                  Swal.fire({ text: 'Đã có lỗi xãy ra' });
+                  setFileKey(fileKey + 1);
+                }
+              }
+            }
+          } else {
+            Swal.fire({ text: 'Không tìm thấy dữ liệu trong file csv' });
+          }
+        }
+      });
+    }
+  };
+
   return (
     <Container maxWidth={'lg'}>
       <Box display={'flex'} justifyContent={'space-between'} marginBottom={2}>
         <Typography variant="h2" color="initial">
-          Danh sách người dùng
+          Danh sách Sinh viên
         </Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<AddCircleOutlined />}
-          LinkComponent={Link}
-          to={Path.UserAdd}
-          className="bg-primary hover:bg-hover"
-        >
-          Thêm người dùng
-        </Button>
+        <Box>
+          <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+            Upload file
+            <VisuallyHiddenInput key={fileKey} onChange={(e) => HandleImportCSV(e)} type="file" />
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlined />}
+            LinkComponent={Link}
+            to={Path.UserAdd}
+            className="bg-primary hover:bg-hover"
+          >
+            Thêm Sinh viên
+          </Button>
+        </Box>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid
@@ -123,6 +194,11 @@ const User = () => {
           slotProps={{
             toolbar: {
               showQuickFilter: true
+            },
+            csvOptions: {
+              utf8WithBom: true,
+              fileName: 'Danh-sach-sinh-vien',
+              delimiter: ','
             }
           }}
           getRowId={(users) => users._id}
@@ -151,4 +227,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default Student;

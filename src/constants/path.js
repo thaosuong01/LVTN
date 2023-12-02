@@ -15,6 +15,8 @@ export const Path = {
 
   // User
   User: '/user',
+  Teacher: '/user/teacher',
+  Student: '/user/student',
   UserAdd: '/user/user-add',
   UserEdit: '/user/user-edit',
 
@@ -31,8 +33,11 @@ export const Path = {
   // Class
   Class: '/class',
 
-  // Course
+  // Department
   Department: '/department',
   DepartmentAdd: '/department/department-add',
-  DepartmentEdit: '/department/department-edit'
+  DepartmentEdit: '/department/department-edit',
+
+  // Document
+  Document: '/document'
 };

@@ -24,6 +24,22 @@ const user = {
       breadcrumbs: false
     },
     {
+      id: 'list-teacher',
+      title: 'Danh sách giảng viên',
+      type: 'item',
+      url: Path.Teacher,
+      icon: icons.UnorderedListOutlined,
+      breadcrumbs: false
+    },
+    {
+      id: 'list-student',
+      title: 'Danh sách sinh viên',
+      type: 'item',
+      url: Path.Student,
+      icon: icons.UnorderedListOutlined,
+      breadcrumbs: false
+    },
+    {
       id: 'add-user',
       title: 'Thêm thông tin người dùng',
       type: 'item',

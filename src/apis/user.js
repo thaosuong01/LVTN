@@ -72,3 +72,16 @@ export const apiCreateUser = async (data) => {
     console.log(error);
   }
 };
+
+// create many student
+export const apiCreateManyStudent = (data) => {
+  try {
+    return instance({
+      method: 'POST',
+      url: '/api/user/create-many-student',
+      data
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

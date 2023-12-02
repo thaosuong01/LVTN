@@ -1,53 +1,53 @@
-import { AddCircleOutlined, Clear } from '@mui/icons-material';
+import { AddCircleOutlined, Clear, EditOutlined } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiDeleteClass, apiGetListClass } from 'apis/class';
+import { apiDeleteUser, apiGetListUser } from 'apis/user';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const Class = () => {
+const Teacher = () => {
   const actionButton = (params) => (
-    <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
-      <Clear />
-    </Button>
+    <div className="flex gap-4">
+      <Button LinkComponent={Link} to={`${Path.UserEdit}/${params.row._id}`} variant="contained" className="bg-primary hover:bg-hover">
+        <EditOutlined />
+      </Button>
+      <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
+        <Clear />
+      </Button>
+    </div>
   );
 
   const columns = [
     {
-      field: 'class_code',
-      headerName: 'Class Code',
-      width: 120
+      field: 'account_id',
+      headerName: 'Username',
+      width: 260,
+      valueGetter: (params) => params.row.account_id?.username
     },
     {
-      field: 'class_name',
-      headerName: 'Class Name',
+      field: 'fullname',
+      headerName: 'Full Name',
+      width: 240
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
       width: 260
     },
     {
-      field: 'display',
-      headerName: 'Display',
-      width: 140
-    },
-    {
-      field: 'owner',
-      headerName: 'Owner',
-      width: 220,
-      valueGetter: (params) => params.row.owner?.fullname
-    },
-    {
-      field: 'course_id',
+      field: 'role_id',
       headerName: 'Role',
-      width: 240,
-      valueGetter: (params) => params.row.course_id?.course_name
+      width: 160,
+      valueGetter: (params) => params.row.role_id?.role_name
     },
     {
       field: 'action',
       headerName: '',
       sortable: false,
       filterable: false,
-      width: 100,
+      width: 180,
       renderCell: actionButton
     }
   ];
@@ -64,53 +64,54 @@ const Class = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await apiDeleteClass(id);
+          await apiDeleteUser(id);
 
-          Swal.fire('Deleted!', 'The class has been deleted.', 'success');
-          fetchClass();
+          Swal.fire('Deleted!', 'User has been deleted.', 'success');
+          fetchUser();
         } catch (error) {
           Swal.fire('Fail!', 'Delete fail', 'error');
         }
       }
     });
   };
-  const [classes, setClasses] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  document.title = 'Lớp học';
+  document.title = 'Người dùng';
 
-  const fetchClass = async () => {
+  const fetchUser = async () => {
     try {
-      const response = await apiGetListClass();
-      setClasses(response?.data);
+      const response = await apiGetListUser();
+      console.log('response?.data: ', response?.data);
+      setUsers(response?.data?.filter((item) => item?.role_id?.role_name === 'Teacher'));
     } catch (error) {
-      console.log('Failed to fetch class list: ', error);
+      console.log('Failed to fetch user list: ', error);
     }
   };
   useEffect(() => {
-    fetchClass();
+    fetchUser();
   }, []);
 
   return (
     <Container maxWidth={'lg'}>
       <Box display={'flex'} justifyContent={'space-between'} marginBottom={2}>
         <Typography variant="h2" color="initial">
-          Danh sách lớp học
+          Danh sách giáo viên
         </Typography>
 
         <Button
           variant="contained"
           startIcon={<AddCircleOutlined />}
           LinkComponent={Link}
-          to={Path.ClassAdd}
+          to={Path.UserAdd}
           className="bg-primary hover:bg-hover"
         >
-          Thêm lớp học
+          Thêm Giáo Viên
         </Button>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid
           checkboxSelection
-          rows={classes}
+          rows={users}
           columns={columns}
           initialState={{
             pagination: {
@@ -125,7 +126,7 @@ const Class = () => {
               showQuickFilter: true
             }
           }}
-          getRowId={(classes) => classes._id}
+          getRowId={(users) => users._id}
           pageSizeOptions={[5]}
           sx={{
             '& div div div div div .MuiDataGrid-withBorderColor': {
@@ -151,4 +152,4 @@ const Class = () => {
   );
 };
 
-export default Class;
+export default Teacher;

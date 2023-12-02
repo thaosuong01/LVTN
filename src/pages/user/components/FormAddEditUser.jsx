@@ -52,7 +52,7 @@ const FormAddEditUser = ({ initialValues, onSubmit, isEditMode }) => {
   return (
     <Container maxWidth={'md'}>
       <Typography marginBottom={2} variant="h3" color="initial">
-        {isEditMode ? 'Cập nhật nhân viên' : 'Thêm nhân viên'}
+        {isEditMode ? 'Cập nhật người dùng' : 'Thêm người dùng'}
       </Typography>
       <Formik enableReinitialize initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         {({ handleChange, handleSubmit, values, touched, errors, isSubmitting }) => {

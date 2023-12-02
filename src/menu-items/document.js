@@ -9,20 +9,20 @@ const icons = {
 
 // ==============================|| MENU ITEMS - SAMPLE PAGE & DOCUMENTATION ||============================== //
 
-const classes = {
-  id: 'class',
-  title: 'Quản lý lớp học',
+const document = {
+  id: 'document',
+  title: 'Quản lý tài liệu và bài giảng',
   type: 'group',
   children: [
     {
-      id: 'list-class',
-      title: 'Danh sách lớp học',
+      id: 'list-document',
+      title: 'Danh sách tài liệu và bài giảng',
       type: 'item',
-      url: Path.Class,
+      url: Path.Document,
       icon: icons.UnorderedListOutlined,
       breadcrumbs: false
     }
   ]
 };
 
-export default classes;
+export default document;

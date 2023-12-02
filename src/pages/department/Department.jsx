@@ -83,7 +83,7 @@ const Department = () => {
     <Container maxWidth={'lg'}>
       <Box display={'flex'} justifyContent={'space-between'} marginBottom={2}>
         <Typography variant="h2" color="initial">
-          Danh sách khóa học
+          Danh sách khoa
         </Typography>
 
         <Button
@@ -93,7 +93,7 @@ const Department = () => {
           to={Path.DepartmentAdd}
           className="bg-primary hover:bg-hover"
         >
-          Thêm khóa học
+          Thêm khoa
         </Button>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>

@@ -27,7 +27,7 @@ import ProfileTab from './ProfileTab';
 import SettingTab from './SettingTab';
 
 // assets
-import avatar1 from 'assets/images/users/avatar-1.png';
+import avatar from 'assets/images/users/avatar.jpg';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 
@@ -105,7 +105,7 @@ const Profile = () => {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          {<Avatar alt="profile user" src={user?.avatar || avatar1} sx={{ width: 32, height: 32 }} />}
+          {<Avatar alt="profile user" src={user?.avatar || avatar} sx={{ width: 32, height: 32 }} />}
 
           <Typography variant="subtitle1">{user?.fullname}</Typography>
         </Stack>
@@ -148,7 +148,7 @@ const Profile = () => {
                       <Grid container justifyContent="space-between" alignItems="center">
                         <Grid item>
                           <Stack direction="row" spacing={1.25} alignItems="center">
-                            <Avatar alt="profile user" src={user?.avatar || avatar1} sx={{ width: 32, height: 32 }} />
+                            <Avatar alt="profile user" src={user?.avatar || avatar} sx={{ width: 32, height: 32 }} />
                             <Stack>
                               <Typography variant="h6">{user.fullname}</Typography>
                               <Typography variant="body2" color="textSecondary">

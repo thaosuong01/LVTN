@@ -17,6 +17,7 @@ import exerciseSubmitRoute from "./routes/exerciseSubmitRoute.js";
 import roleRoute from "./routes/roleRoute.js";
 import topicRoute from "./routes/topicRoute.js";
 import uploadRoute from "./routes/uploadRoute.js";
+import lectureRoute from "./routes/lectureRoute.js";
 import userRoute from "./routes/userRoute.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,6 +52,7 @@ app.use("/api/enrol", enrolRoute);
 app.use("/api/class", classRoute);
 app.use("/api/topic", topicRoute);
 app.use("/api/upload", uploadRoute);
+app.use("/api/lecture", lectureRoute);
 app.use("/api/exercise", exerciseRoute);
 app.use("/api/exercise-submit", exerciseSubmitRoute);
 

@@ -56,10 +56,14 @@ export const getAllClassController = async (req, res, next) => {
 
 export const getClassByIdController = async (req, res, next) => {
   try {
-    const getClass = await Class.findById(req.params.id).populate(
-      "course_id",
-      "course_code course_name class_pass"
-    );
+    const getClass = await Class.findById(req.params.id).populate({
+      path: "course_id",
+      select: "course_code course_name class_pass",
+      populate: {
+        path: "department_id",
+        select: "department_name",
+      },
+    });
 
     if (!getClass) {
       return next(new ApiError(404, "Class not found"));

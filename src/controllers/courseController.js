@@ -116,7 +116,7 @@ export const deleteCourseController = async (req, res, next) => {
       return next(new ApiError(404, "Course not found"));
     }
 
-    return res.status(201).send("Course deleted successfully");
+    return res.status(200).send("Course deleted successfully");
   } catch (error) {
     console.log(error);
     next(new ApiError(500, error.message));

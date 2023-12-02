@@ -2,7 +2,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import SettingsIcon from "@mui/icons-material/Settings";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { List, ListItem, Pagination, Stack, Typography } from "@mui/material";
+import { List, ListItem, Typography } from "@mui/material";
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -111,6 +111,7 @@ const ManageCourse = () => {
 
   const handleClose = () => {
     setOpen(false);
+    fetchClasses();
   };
 
   const handleDelete = (id) => {
@@ -144,7 +145,7 @@ const ManageCourse = () => {
               {department?.department_name}
             </Typography>
 
-            <div className="text-center">
+            <div className="text-center my-6">
               <Link
                 to={`/${path.ADDCOURSE}`}
                 className="bg-button hover:bg-[#5b9608] text-white p-2 transition-all ease-in-out duration-150"
@@ -152,7 +153,7 @@ const ManageCourse = () => {
                 Tạo lớp học mới
               </Link>
             </div>
-            <div className="flex justify-center my-8">
+            {/* <div className="flex justify-center my-8">
               <Stack spacing={2}>
                 <Pagination
                   count={10}
@@ -183,7 +184,7 @@ const ManageCourse = () => {
                   }}
                 />
               </Stack>
-            </div>
+            </div> */}
             {classes.map((item) => (
               <List key={item?._id}>
                 <ListItem className="flex items-center">

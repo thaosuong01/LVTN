@@ -186,10 +186,12 @@ const PracticePage = () => {
                 <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
                   Trạng thái nộp
                 </Typography>
-                <div className="flex justify-end font-bold text-xl">
-                  <span>{exerciseOfStudent?.grade}</span>
-                  <span>/10</span>
-                </div>
+                {exerciseOfStudent?.grade && (
+                  <div className="flex justify-end font-bold text-xl">
+                    <span>{exerciseOfStudent?.grade}</span>
+                    <span>/10</span>
+                  </div>
+                )}
                 <div className="my-4 border">
                   <div className="flex p-2">
                     <Typography className="w-[30%]">Trạng thái nộp</Typography>
@@ -220,7 +222,9 @@ const PracticePage = () => {
                       Tình trạng chấm điểm
                     </Typography>
                     <span className="w-[70%]">
-                      {"Đã chấm điểm" ?? "Chưa chấm điểm"}
+                      {exerciseOfStudent?.grade
+                        ? "Đã chấm điểm"
+                        : "Chưa chấm điểm"}
                     </span>
                   </div>
                   <div className="flex bg-slate-200 p-2">

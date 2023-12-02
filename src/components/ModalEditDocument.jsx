@@ -189,7 +189,7 @@ const ModalEditDocument = ({ open, handleClose, documentId }) => {
                   className="w-[70%]"
                   sx={{ fontWeight: "bold" }}
                 >
-                  Chỉnh sửa tài liệu hoặc bài giảng
+                  Chỉnh sửa tài liệu
                 </Typography>
               </div>
               <div>

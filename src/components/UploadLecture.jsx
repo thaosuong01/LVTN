@@ -1,12 +1,18 @@
 import ClearIcon from "@mui/icons-material/Clear";
-import { Box, IconButton, InputLabel, Modal, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputLabel,
+  Modal,
+  TextField,
+} from "@mui/material";
 import { Formik } from "formik";
-import React, { useCallback, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import React from "react";
 import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
-import { uploadDocument } from "../api/upload";
+import { apiAddLectureVideo } from "../api/lecture";
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -40,73 +46,12 @@ const style = {
 };
 
 const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
-  const [files, setFiles] = useState([]);
-  console.log("files: ", files);
-  const [rejected, setRejected] = useState([]);
-
-  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
-    console.log("acceptedFiles: ", acceptedFiles);
-    if (acceptedFiles?.length) {
-      setFiles((previousFiles) => [
-        ...previousFiles,
-        // ...acceptedFiles.map((file) => ({
-        //   ...file,
-        //   preview: URL.createObjectURL(file),
-        // })),
-        ...acceptedFiles,
-      ]);
-    }
-
-    if (rejectedFiles?.length) {
-      setRejected((previousFiles) => [...previousFiles, ...rejectedFiles]);
-    }
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: [
-      "application/pdf",
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    ],
-    // maxSize: 1000000,
-    onDrop,
-  });
-
-  useEffect(() => {
-    // Revoke the data uris to avoid memory leaks
-    return () => {
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
-    };
-  }, [files]);
-
-  const removeFile = (path) => {
-    setFiles((files) => files.filter((file) => file.path !== path));
-  };
-
-  const removeAll = () => {
-    setFiles([]);
-    setRejected([]);
-  };
-
-  const removeRejected = (path) => {
-    setRejected((files) => files.filter(({ file }) => file.path !== path));
-  };
-
   const onSubmit = async (values) => {
-    if (!files?.length) return;
-    console.log("files: ", files);
-
     try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append("files", renameFile(file, fSlug(file.name)));
-      });
-
-      formData.append("title", values.title);
-      formData.append("class_id", classId);
-      formData.append("topic_id", topicId);
-
-      const response = await uploadDocument(formData);
+      values.class_id = classId;
+      values.topic_id = topicId;
+      console.log("values: ", values);
+      const response = await apiAddLectureVideo(values);
       if (response.status === 201) {
         Swal.fire({
           text: "Tải lên thành công!",
@@ -125,10 +70,11 @@ const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
     }
   };
 
-  const initialValues = { title: "" };
+  const initialValues = { title: "", video_link: "" };
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Vui lòng nhập tiêu đề"),
+    video_link: Yup.string().required("Vui lòng thêm đường dẫn bài giảng"),
   });
 
   return (
@@ -167,103 +113,64 @@ const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
                   onSubmit={onSubmit}
                   enableReinitialize
                 >
-                  {({ touched, handleSubmit, getFieldProps, errors }) => {
+                  {({
+                    values,
+                    touched,
+                    handleSubmit,
+                    handleChange,
+                    errors,
+                  }) => {
                     return (
                       <form
                         onSubmit={handleSubmit}
                         encType="multipart/form-data"
                       >
-                        <div className="">
-                          <div className="flex justify-center items-center my-2">
-                            <InputLabel className="w-[30%]">Tiêu đề</InputLabel>
-                            <div className="w-[70%]">
-                              <TextField
-                                name="title"
-                                variant="outlined"
-                                fullWidth
-                                {...getFieldProps("title")}
-                                error={touched.title && Boolean(errors.title)}
-                                helperText={touched.title && errors.title}
-                              />
-                            </div>
+                        <div className="flex justify-center items-center my-2">
+                          <InputLabel className="w-[30%]">Tiêu đề</InputLabel>
+                          <div className="w-[70%]">
+                            <TextField
+                              name="title"
+                              variant="outlined"
+                              value={values?.title}
+                              onChange={handleChange}
+                              fullWidth
+                              error={touched.title && Boolean(errors.title)}
+                              helperText={touched.title && errors.title}
+                            />
                           </div>
                         </div>
-                        <div>
-                          <InputLabel>Files</InputLabel>
-                          <div
-                            className="p-16 mt-2 border border-neutral-200 cursor-pointer"
-                            {...getRootProps({})}
-                          >
-                            <input {...getInputProps()} />
-                            <div className="flex flex-col items-center justify-center gap-4">
-                              <img
-                                src="/../src/assets/icons/upload-icon.png"
-                                alt=""
-                                width={100}
-                              />
-                              {isDragActive ? (
-                                <p>Drop the PDF files here</p>
-                              ) : (
-                                <p>
-                                  Drag & drop PDF files here, or click to select
-                                  files
-                                </p>
-                              )}
-                            </div>
+                        <div className="flex justify-center items-center my-2">
+                          <InputLabel className="w-[30%]">
+                            Link bài giảng
+                          </InputLabel>
+                          <div className="w-[70%]">
+                            <TextField
+                              name="video_link"
+                              variant="outlined"
+                              fullWidth
+                              value={values?.video_link}
+                              onChange={handleChange}
+                              error={
+                                touched.video_link && Boolean(errors.video_link)
+                              }
+                              helperText={
+                                touched.video_link && errors.video_link
+                              }
+                            />
                           </div>
-
-                          {/* Preview */}
-                          <section className="mt-10">
-                            <div className="flex gap-4">
-                              <h2 className="title text-3xl font-semibold">
-                                Preview
-                              </h2>
-                              <button
-                                type="button"
-                                onClick={removeAll}
-                                className="mt-1 text-[12px] uppercase tracking-wider font-bold text-neutral-500 border border-secondary-400 rounded-md px-3 hover:bg-secondary-400 hover:text-neutral-700 transition-colors"
-                              >
-                                Remove all files
-                              </button>
-                              <button
-                                type="submit"
-                                className="ml-auto mt-1 text-[12px] uppercase tracking-wider font-bold text-neutral-500 border border-[#90c446] rounded-md px-3 hover:bg-button hover:text-white transition-colors"
-                              >
-                                Upload Files
-                              </button>
-                            </div>
-
-                            {/* Accepted files */}
-                            {files?.length > 0 && (
-                              <div>
-                                <h3 className="title text-lg font-semibold text-neutral-600 mt-10 border-b pb-3">
-                                  Accepted Files
-                                </h3>
-                                <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10">
-                                  {files.map((file) => (
-                                    <li
-                                      key={file.path}
-                                      className="relative h-32 rounded-md shadow-lg"
-                                    >
-                                      <img
-                                        src="/../src/assets/icons/pdf-icon.png"
-                                        alt="PDF Icon"
-                                        className="h-full w-full object-contain rounded-md"
-                                      />
-                                      <button
-                                        type="button"
-                                        className="w-7 h-7 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-white transition-colors"
-                                        onClick={() => removeFile(file.path)}
-                                      >
-                                        <ClearIcon className="w-5 h-5 fill-white hover:fill-secondary-400 transition-colors" />
-                                      </button>
-                                      <span>{file.path}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </section>
+                        </div>
+                        <div className="my-4">
+                          <Button
+                            type="submit"
+                            fullWidth
+                            sx={{
+                              backgroundColor: "#ffae00",
+                              "&:hover": { backgroundColor: "#ff9500" },
+                              color: "white",
+                            }}
+                          >
+                            Thêm bài giảng
+                          </Button>
                         </div>
                       </form>
                     );

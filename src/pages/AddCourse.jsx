@@ -1,8 +1,11 @@
 import {
   Button,
   Container,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
   Typography,
@@ -17,6 +20,7 @@ import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { apiAddClass } from "../api/class";
 import { path } from "../utils/path";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const AddCourse = () => {
   const { user } = useSelector((state) => state.user);
@@ -57,7 +61,6 @@ const AddCourse = () => {
   });
 
   const handleAdd = async (values) => {
-    
     try {
       const response = await apiAddClass(values);
 
@@ -74,8 +77,15 @@ const AddCourse = () => {
         text: error?.response?.data?.message ?? error?.message,
         confirmButtonColor: "#ffae00",
       });
-      
     }
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
   return (
@@ -131,9 +141,7 @@ const AddCourse = () => {
                     </div>
 
                     <div className="flex justify-center items-center my-2">
-                      <InputLabel className="w-[30%]">
-                        Mã lớp học
-                      </InputLabel>
+                      <InputLabel className="w-[30%]">Mã lớp học</InputLabel>
                       <div className="w-[70%]">
                         <TextField
                           name="class_code"
@@ -163,7 +171,24 @@ const AddCourse = () => {
                     <div className="flex justify-center items-center my-2">
                       <InputLabel className="w-[30%]">Mật khẩu</InputLabel>
                       <div className="w-[70%]">
-                        <TextField
+                        <OutlinedInput
+                          type={showPassword ? "text" : "password"}
+                          endAdornment={
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={handleClickShowPassword}
+                                onMouseDown={handleMouseDownPassword}
+                                edge="end"
+                              >
+                                {showPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          }
                           name="class_pass"
                           variant="outlined"
                           fullWidth

@@ -22,6 +22,8 @@ import ModalAdd from "./ModalAdd";
 import ModalAddTopic from "./ModalAddTopic";
 import ModalEditDocument from "./ModalEditDocument";
 import ModalEditTopic from "./ModalEditTopic";
+import { apiDeleteLecture, apiGetLectureByClassId } from "../api/lecture";
+import ModalEditLecture from "./ModalEditLecture";
 
 const ListDocument = () => {
   const { isEditMode: editMode } = useSelector((state) => state.course);
@@ -32,6 +34,9 @@ const ListDocument = () => {
 
   const [topicId, setTopicId] = useState("");
   const [open, setOpen] = useState(false);
+
+  const { cid } = useParams();
+
   const handleOpen = (topicId) => {
     setOpen(true);
     setTopicId(topicId);
@@ -64,6 +69,7 @@ const ListDocument = () => {
   const onCloseModalAdd = () => {
     setOpenModalAdd(false);
     getDocumentsByClassId(cid);
+    getLectureByClassId(cid);
   };
 
   const [docId, setDocId] = useState("");
@@ -79,10 +85,20 @@ const ListDocument = () => {
     getDocumentsByClassId(cid);
   };
 
-  const { user } = useSelector((state) => state.user);
-  console.log("user: ", user);
+  const [openModalEditLecture, setOpenModalEditLecture] = useState(false);
+  const [lectureId, setLectureId] = useState([]);
 
-  const { cid } = useParams();
+  const handleOpenModalEditLecture = (lectureId) => {
+    setOpenModalEditLecture(true);
+    setLectureId(lectureId);
+  };
+
+  const handleCloseModalEditLecture = () => {
+    setOpenModalEditLecture(false);
+    getLectureByClassId(cid);
+  };
+
+  const { user } = useSelector((state) => state.user);
 
   const [classes, setClasses] = useState();
   useEffect(() => {
@@ -117,6 +133,21 @@ const ListDocument = () => {
   useEffect(() => {
     // Gọi hàm getDocumentsByClassId với cid hiện tại
     getDocumentsByClassId(cid);
+  }, [cid]);
+
+  const [lectures, setLectures] = useState([]);
+
+  const getLectureByClassId = async (cid) => {
+    try {
+      const response = await apiGetLectureByClassId(cid);
+      setLectures(response?.data?.lectures);
+    } catch (error) {
+      console.error("Error fetching lectures:", error);
+    }
+  };
+
+  useEffect(() => {
+    getLectureByClassId(cid);
   }, [cid]);
 
   const [exercises, setExercises] = useState([]);
@@ -174,7 +205,7 @@ const ListDocument = () => {
           const response = await apiDeleteDocumentById(did);
           console.log(response);
           Swal.fire("Deleted!", "The document has been deleted.", "success");
-          getDocumentsByClassId(cid);
+          await getDocumentsByClassId(cid);
         } catch (error) {
           Swal.fire("Fail!", "Delete fail", "error");
         }
@@ -199,6 +230,29 @@ const ListDocument = () => {
           console.log(response);
           Swal.fire("Deleted!", "The exercise has been deleted.", "success");
           getExercisesByClassId(cid);
+        } catch (error) {
+          Swal.fire("Fail!", "Delete fail", "error");
+        }
+      }
+    });
+  };
+
+  const handleDeleteLecture = (lid) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffae00",
+      cancelButtonColor: "#90c446",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await apiDeleteLecture(lid);
+          console.log(response);
+          Swal.fire("Deleted!", "The lecture has been deleted.", "success");
+          getLectureByClassId(cid);
         } catch (error) {
           Swal.fire("Fail!", "Delete fail", "error");
         }
@@ -393,6 +447,51 @@ const ListDocument = () => {
                   }
                 }
               })}
+
+              {lectures.map((lecture) => {
+                if (lecture.topic_id === topic?._id) {
+                  return (
+                    <List key={lecture._id}>
+                      <ListItem disablePadding>
+                        <div className="flex justify-between w-full">
+                          <div className="flex gap-4 w-[80%] items-center">
+                            <img
+                              src="/../src/assets/icons/video.png"
+                              alt="Folder"
+                              width={40}
+                            />
+                            <Link to={lecture?.video_link}>
+                              {lecture?.title}
+                            </Link>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end items-center w-[20%]  cursor-pointer">
+                          <Checkbox />
+                          {editMode ? (
+                            <div className="flex gap-2">
+                              <span
+                                className="text-sm text-primary hover:text-hover"
+                                onClick={() =>
+                                  handleOpenModalEditLecture(lecture?._id)
+                                }
+                              >
+                                Chỉnh sửa
+                              </span>
+                              <span
+                                className="text-primary text-sm hover:text-hover"
+                                onClick={() => handleDeleteLecture(lecture._id)}
+                              >
+                                Xóa
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </ListItem>
+                    </List>
+                  );
+                }
+              })}
             </Fragment>
           ))}
         </div>
@@ -429,6 +528,13 @@ const ListDocument = () => {
           handleClose={handleCloseModalEditDocument}
           documentId={docId}
           open={openModalEditDocument}
+        />
+      )}
+      {openModalEditLecture && (
+        <ModalEditLecture
+          handleClose={handleCloseModalEditLecture}
+          lectureId={lectureId}
+          open={openModalEditLecture}
         />
       )}
     </>

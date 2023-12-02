@@ -57,7 +57,11 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { "image/png": [], "application/pdf": [] },
+    accept: [
+      "application/pdf",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ],
     // maxSize: 1000000,
     onDrop,
   });

@@ -47,10 +47,15 @@ const Login = () => {
         dispatch(setAccessToken(response.data.jwtToken));
         localStorage.setItem("access_token", response.data.jwtToken);
         navigate("/");
+      } else {
+        Swal.fire({
+          text: "Username or password is incorrect",
+          confirmButtonColor: "#ffae00",
+        });
       }
     } catch (error) {
       Swal.fire({
-        text: error?.response?.data?.message ?? error?.message,
+        text: "Username or password is incorrect",
         confirmButtonColor: "#ffae00",
       });
       console.log(error);

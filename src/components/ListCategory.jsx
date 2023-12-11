@@ -65,7 +65,7 @@ const ListCategory = () => {
                           sx={{ fontSize: "18px" }}
                           className="text-[#1c57a5] hover:text-[#222] transition-all ease-in-out"
                         >
-                          {child?.name}
+                          {`${child?.name} - ${child?.code}`}
                         </Typography>
                       </ListItemButton>
                     ))}

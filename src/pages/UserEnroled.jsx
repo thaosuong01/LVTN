@@ -68,16 +68,17 @@ const UserEnroled = () => {
   const [course, setCourse] = useState([]);
   const course_id = classes?.course_id?._id;
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
+  const fetchCourse = async () => {
+    try {
+      if (course_id) {
         const response = await apiGetCourseByID(course_id);
         setCourse(response?.data);
-      } catch (error) {
-        console.log(error);
       }
-    };
-
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
     fetchCourse();
   }, [course_id]);
 

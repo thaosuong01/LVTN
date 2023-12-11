@@ -10,7 +10,6 @@ const ListMyCourse = () => {
   const { user } = useSelector((state) => state.user);
 
   const [listClass, setListClass] = useState([]);
-  console.log("listClass: ", listClass);
 
   const getClassEnrolOfStudent = async () => {
     const response = await apiGetClassEnrolOfStudent(user?._id);
@@ -55,7 +54,10 @@ const ListMyCourse = () => {
                     </Typography>
                   </Grid>
                   <Grid item mt={2}>
-                    <Link to={`/${path.CLASSPAGE}/${classes?.class_id?._id}`} className="hover:bg-[#FF9500] border bg-primary p-2 text-white">
+                    <Link
+                      to={`/${path.CLASSPAGE}/${classes?.class_id?._id}`}
+                      className="hover:bg-[#FF9500] border bg-primary p-2 text-white"
+                    >
                       Click to enter this course
                     </Link>
                   </Grid>

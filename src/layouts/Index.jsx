@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const accessToken = useSelector((state) => state.auth.accessToken);
-  console.log("accessToken: ", accessToken);
+  // console.log("accessToken: ", accessToken);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -53,14 +53,14 @@ const Index = () => {
       const expirationTime = decodedToken.exp;
       const currentTime = Math.floor(Date.now() / 1000); // Chia 1000 để chuyển đổi sang đơn vị giây
       if (expirationTime >= currentTime) {
-        console.log("Token còn thời hạn");
+        // console.log("Token còn thời hạn");
       } else {
         Swal.fire({
           text: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!",
           confirmButtonColor: "#ffae00",
         }).then(handleLogout());
 
-        console.log("Token đã hết hạn");
+        // console.log("Token đã hết hạn");
       }
     } else {
       console.log("Không thể kiểm tra thời hạn của token");

@@ -1,9 +1,10 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { Menu, MenuItem } from "@mui/material";
+import { useFormik } from "formik";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -33,6 +34,23 @@ const Header = () => {
     localStorage.removeItem("editingMode");
     window.location.href = "/login";
   };
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handleSearch = async (values) => {
+    const course_code = values.searchTerm.toUpperCase();
+    setSearchParams({
+      search: course_code,
+    });
+    
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      searchTerm: "",
+    },
+    onSubmit: handleSearch,
+  });
 
   return (
     <>
@@ -157,22 +175,27 @@ const Header = () => {
               </div>
               {user && (
                 <div className="relative">
-                  <div
-                    className="py-3 px-5 bg-primary hover:bg-hover transition-all ease-in-out cursor-pointer"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <SearchIcon style={{ fontSize: "24px" }} />
-                  </div>
-                  {showInput && (
-                    <input
-                      type="text"
-                      className="absolute top-0 left-0 transform -translate-x-full py-3 px-5 bg-[#555] h-[100%] focus:outline-none transition-all ease-in-out duration-150"
-                      placeholder="Search..."
-                      onMouseEnter={() => setShowInput(true)}
-                      onMouseLeave={() => setShowInput(false)}
-                    />
-                  )}
+                  <form onSubmit={formik.handleSubmit}>
+                    <div
+                      className="py-3 px-5 bg-primary hover:bg-hover transition-all ease-in-out cursor-pointer"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <SearchIcon style={{ fontSize: "24px" }} />
+                    </div>
+                    {showInput && (
+                      <input
+                        type="search"
+                        className="absolute top-0 left-0 transform -translate-x-full py-3 px-5 bg-[#555] h-[100%] focus:outline-none transition-all ease-in-out duration-150"
+                        placeholder="Search..."
+                        name="searchTerm"
+                        value={formik.values.searchTerm}
+                        onChange={formik.handleChange}
+                        onMouseEnter={() => setShowInput(true)}
+                        onMouseLeave={() => setShowInput(false)}
+                      />
+                    )}
+                  </form>
                 </div>
               )}
             </div>

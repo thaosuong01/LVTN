@@ -1,5 +1,6 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import {
+  Checkbox,
   FormHelperText,
   InputLabel,
   MenuItem,
@@ -85,6 +86,7 @@ const CreatePractice = () => {
 
   const onSubmit = async (values, { setErrors }) => {
     console.log("values: ", values);
+
     const {
       start_date,
       start_time,
@@ -92,6 +94,7 @@ const CreatePractice = () => {
       deadline_time,
       title,
       display,
+      isNotify,
     } = values;
 
     const startDate = start_date.format("YYYY-MM-DD");
@@ -110,7 +113,9 @@ const CreatePractice = () => {
     const compareWithCurrentDate = start.diff(currenDate, "minutes");
 
     if (compare >= 0) {
-      setErrors({ start_date: "Thời gian bắt đầu phải hơn dealine" });
+      setErrors({
+        start_date: "Thời gian bắt đầu phải nhỏ hơn thời hạn nộp bài",
+      });
       return;
     }
 
@@ -131,11 +136,11 @@ const CreatePractice = () => {
       formData.append("class_id", class_id);
       formData.append("topic_id", topic_id);
       formData.append("display", display);
+      formData.append("isNotify", isNotify);
       formData.append("start_time", dateTimeStart);
       formData.append("deadline", dateTimeDeadline);
 
       const response = await apiCreateExercise(formData);
-      console.log("response: ", response);
       if (response.status === 201) {
         Swal.fire({
           text: "Tải lên thành công!",
@@ -158,6 +163,7 @@ const CreatePractice = () => {
     deadline_date: "",
     deadline_time: "",
     display: false,
+    isNotify: false,
   };
 
   const validationSchema = Yup.object().shape({
@@ -302,6 +308,20 @@ const CreatePractice = () => {
                             <MenuItem value={true}>Mở</MenuItem>
                             <MenuItem value={false}>Đóng</MenuItem>
                           </Select>
+                        </div>
+                      </div>
+
+                      {/* Checkbox for "Thông báo cho sinh viên" */}
+                      <div className="flex items-center my-4">
+                        <InputLabel className="w-[30%]">
+                          Thông báo cho sinh viên
+                        </InputLabel>
+                        <div className="w-[70%] flex items-center">
+                          <Checkbox
+                            {...getFieldProps("isNotify")}
+                            checked={values.isNotify}
+                            onChange={handleChange}
+                          />
                         </div>
                       </div>
 

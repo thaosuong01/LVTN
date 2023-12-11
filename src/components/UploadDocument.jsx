@@ -1,5 +1,12 @@
 import ClearIcon from "@mui/icons-material/Clear";
-import { Box, IconButton, InputLabel, Modal, TextField } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  IconButton,
+  InputLabel,
+  Modal,
+  TextField,
+} from "@mui/material";
 import { Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -87,6 +94,8 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
   };
 
   const onSubmit = async (values) => {
+    console.log("values: ", values);
+
     if (!files?.length) return;
     console.log("files: ", files);
 
@@ -97,10 +106,12 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
       });
 
       formData.append("title", values.title);
+      formData.append("isNotify", values.isNotify);
       formData.append("class_id", classId);
       formData.append("topic_id", topicId);
 
       const response = await uploadDocument(formData);
+
       if (response.status === 201) {
         Swal.fire({
           text: "Tải lên thành công!",
@@ -119,7 +130,7 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
     }
   };
 
-  const initialValues = { title: "" };
+  const initialValues = { title: "", isNotify: false };
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Vui lòng nhập tiêu đề"),
@@ -161,7 +172,14 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
                   onSubmit={onSubmit}
                   enableReinitialize
                 >
-                  {({ touched, handleSubmit, getFieldProps, errors }) => {
+                  {({
+                    touched,
+                    handleSubmit,
+                    handleChange,
+                    getFieldProps,
+                    errors,
+                    values,
+                  }) => {
                     return (
                       <form
                         onSubmit={handleSubmit}
@@ -174,12 +192,26 @@ const UploadDocument = ({ handleClose, topicId, classId, open, onClose }) => {
                               <TextField
                                 name="title"
                                 variant="outlined"
+                                value={values.title}
                                 fullWidth
                                 {...getFieldProps("title")}
                                 error={touched.title && Boolean(errors.title)}
                                 helperText={touched.title && errors.title}
                               />
                             </div>
+                          </div>
+                        </div>
+                        {/* Checkbox for "Thông báo cho sinh viên" */}
+                        <div className="flex items-center my-4">
+                          <InputLabel className="w-[30%]">
+                            Thông báo cho sinh viên
+                          </InputLabel>
+                          <div className="w-[70%] flex items-center">
+                            <Checkbox
+                              {...getFieldProps("isNotify")}
+                              checked={values.isNotify}
+                              onChange={handleChange}
+                            />
                           </div>
                         </div>
                         <div>

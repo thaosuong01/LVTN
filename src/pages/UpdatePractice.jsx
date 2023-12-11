@@ -207,7 +207,7 @@ const UpdatePractice = () => {
         <div className="flex gap-8 px-5">
           <div className="w-[80%]">
             <div className="flex justify-center pb-4">
-              <h1 className="text-2xl font-bold">Thêm bài tập</h1>
+              <h1 className="text-2xl font-bold">Cập nhật bài tập</h1>
             </div>
             <div>
               <Formik

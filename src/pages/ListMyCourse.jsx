@@ -8,9 +8,7 @@ import RightNavigate from "../components/RightNavigate";
 
 const ListMyCourse = () => {
   const { user } = useSelector((state) => state.user);
-
   const [listClass, setListClass] = useState([]);
-  console.log("listClass: ", listClass);
 
   const getClassEnrolOfStudent = async () => {
     const response = await apiGetClassEnrolOfStudent(user?._id);

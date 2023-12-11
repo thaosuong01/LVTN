@@ -2,6 +2,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import {
   Box,
   Button,
+  Checkbox,
   IconButton,
   InputLabel,
   Modal,
@@ -47,10 +48,10 @@ const style = {
 
 const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
   const onSubmit = async (values) => {
+
     try {
       values.class_id = classId;
       values.topic_id = topicId;
-      console.log("values: ", values);
       const response = await apiAddLectureVideo(values);
       if (response.status === 201) {
         Swal.fire({
@@ -70,7 +71,7 @@ const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
     }
   };
 
-  const initialValues = { title: "", video_link: "" };
+  const initialValues = { title: "", video_link: "", isNotify: false };
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Vui lòng nhập tiêu đề"),
@@ -119,6 +120,7 @@ const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
                     handleSubmit,
                     handleChange,
                     errors,
+                    getFieldProps,
                   }) => {
                     return (
                       <form
@@ -156,6 +158,19 @@ const UploadLecture = ({ handleClose, topicId, classId, open, onClose }) => {
                               helperText={
                                 touched.video_link && errors.video_link
                               }
+                            />
+                          </div>
+                        </div>
+                        {/* Checkbox for "Thông báo cho sinh viên" */}
+                        <div className="flex items-center my-4">
+                          <InputLabel className="w-[30%]">
+                            Thông báo cho sinh viên
+                          </InputLabel>
+                          <div className="w-[70%] flex items-center">
+                            <Checkbox
+                              {...getFieldProps("isNotify")}
+                              checked={values.isNotify}
+                              onChange={handleChange}
                             />
                           </div>
                         </div>

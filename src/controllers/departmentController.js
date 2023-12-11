@@ -55,6 +55,7 @@ export const getDepartmentsWithCourses = async (req, res, next) => {
         courses: courses.map((course) => ({
           id: course._id,
           name: course.course_name,
+          code: course.course_code,
         })),
       });
     }

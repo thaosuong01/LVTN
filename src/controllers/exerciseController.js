@@ -1,4 +1,6 @@
+import sendMail from "../config/send-mail.js";
 import { ApiError } from "../middlewares/api-error.js";
+import Enrol from "../models/Enrol.js";
 import Exercise from "../models/Exercise.js";
 import fs from "fs";
 
@@ -6,19 +8,28 @@ export const createExerciseController = async (req, res, next) => {
   try {
     const file_name = req?.files?.map((item) => item?.filename);
 
-    const { title, files, deadline, start_time, class_id, topic_id, display } =
-      await req.body;
+    const {
+      title,
+      files,
+      deadline,
+      start_time,
+      class_id,
+      topic_id,
+      display,
+      isNotify,
+    } = await req.body;
 
     // Check unique title
     // const exerciseExist = await Exercise.findOne({ title });
     // if (exerciseExist) {
-    if (file_name?.length > 0) {
-      for (const file of file_name) {
-        fs.unlink(`src/uploads/exercises/${file}`, (err) => {
-          if (err) throw err;
-        });
-      }
-    }
+    //   if (file_name?.length > 0) {
+    //     for (const file of file_name) {
+    //       fs.unlink(`src/uploads/exercises/${file}`, (err) => {
+    //         if (err) throw err;
+    //       });
+    //     }
+    //   }
+    // }
 
     const exercise = await Exercise.create({
       title,
@@ -30,6 +41,22 @@ export const createExerciseController = async (req, res, next) => {
       files: file_name,
       display,
     });
+
+    // Nếu có isNotify thì sẽ thực hiện gửi mail cho các sinh viên
+    if (exercise && isNotify === "true") {
+      //Lấy ra danh sách email của sinh viên trong lớp
+      const students = await Enrol.find({ class_id })
+        .populate("user_id", "email")
+        .populate("class_id");
+      const emails = students?.map((student) => student.user_id.email);
+      const html = `Giáo viên vừa thêm ${title} vào lớp <b>${students[0].class_id.class_name}</b>. Click vào <a href="http://localhost:5173/course/class/${class_id}">Link</a> để xem chi tiết.`;
+
+      const rs = await sendMail({ html });
+      rs.accepted.length > 0 &&
+        console.log("Gửi mail thành công cho: " + rs.accepted);
+      rs.rejected.length > 0 &&
+        console.log("Gửi mail Thất bại cho: " + rs.rejected);
+    }
 
     return res.status(201).json(exercise);
   } catch (error) {

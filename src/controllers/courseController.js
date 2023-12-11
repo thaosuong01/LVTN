@@ -31,7 +31,7 @@ export const updateCourseController = async (req, res, next) => {
     const { course_code, course_name, department_id } = await req.body;
 
     const courseExists = await Course.exists({ course_code });
-    console.log('courseExists: ', courseExists);
+    console.log("courseExists: ", courseExists);
 
     if (courseExists && course_id === courseExists._id) {
       return next(new ApiError(409, "Course code already exists"));
@@ -72,6 +72,21 @@ export const getAllCourseController = async (req, res, next) => {
   }
 };
 
+export const getCoursesByCode = async (req, res, next) => {
+  try {
+    const { course_code } = await req.params;
+    const courses = await Course.findOne({ course_code }).populate(
+      "department_id",
+      "department_name"
+    );
+
+    return res.status(200).json(courses);
+  } catch (error) {
+    console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
 export const getCourseByIDController = async (req, res, next) => {
   try {
     const course_id = await req.params.cid;
@@ -94,9 +109,9 @@ export const getCourseByDepartmentController = async (req, res, next) => {
   try {
     const depart_id = await req.params.did;
 
-    const courses = await Course.find({ department_id: depart_id }).select(
-      "course_code course_name"
-    ).populate("department_id", "department_name");
+    const courses = await Course.find({ department_id: depart_id })
+      .select("course_code course_name")
+      .populate("department_id", "department_name");
 
     res.status(200).json(courses);
   } catch (error) {
@@ -104,7 +119,6 @@ export const getCourseByDepartmentController = async (req, res, next) => {
     next(new ApiError(500, error.message));
   }
 };
-
 
 export const deleteCourseController = async (req, res, next) => {
   try {

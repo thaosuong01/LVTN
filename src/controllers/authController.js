@@ -66,7 +66,7 @@ export const loginController = async (req, res, next) => {
     const role_name = user?.role_id?.role_name;
     const user_id = user?._id;
     const jwtToken = jwt.sign({ user_id, role_name }, process.env.JWT_SECRET, {
-      expiresIn: "3d",
+      expiresIn: "1d",
     });
 
     return res.status(200).json({ jwtToken });
@@ -75,5 +75,4 @@ export const loginController = async (req, res, next) => {
     next(new ApiError(500, error.message));
   }
 };
-
 

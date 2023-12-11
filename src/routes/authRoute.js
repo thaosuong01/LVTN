@@ -11,5 +11,4 @@ router.post("/create", [isAuthentication, isAdmin], createUserController);
 // router.put("/user-edit/:id", [isAuthentication, isAdmin], updateUser);
 router.post("/login", loginController);
 
-
 export default router;

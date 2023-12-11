@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addStudentToClass,
   enrolmentController,
   getClassEnrolOfStudent,
   getEnrolledStudents,
@@ -10,6 +11,7 @@ import { isAuthentication } from "../middlewares/auth-middleware.js";
 const router = express.Router();
 
 router.post("/create", [isAuthentication], enrolmentController);
+router.post("/add-student-to-class", addStudentToClass);
 router.get("/get-student-enrol-in-class/:cid", getEnrolledStudents);
 router.delete("/delete-student-enrol-in-class/:eid", removeEnrollment);
 router.get(

@@ -24,7 +24,7 @@ const data = [
     label: "Thành viên",
     children: [
       {
-        childLabel: "Người dùng đã ghi danh",
+        childLabel: "Danh sách thành viên",
         path: `/${path.LISTCOURSEOFTEACHER}`,
         icon: PersonIcon,
       },

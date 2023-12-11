@@ -15,7 +15,6 @@ const RightNavigate = () => {
   const { departments } = useSelector((state) => state.department);
 
   const [listClass, setListClass] = useState([]);
-  console.log('listClass: ', listClass);
 
   const getClassEnrolOfStudent = async () => {
     const response = await apiGetClassEnrolOfStudent(user?._id);
@@ -26,14 +25,15 @@ const RightNavigate = () => {
     getClassEnrolOfStudent();
   }, [user?._id]);
 
-
   const getClassByOwner = async () => {
     const response = await apiGetClassCreatedByOwner();
     setListClass(response?.data);
   };
 
   useEffect(() => {
-    getClassByOwner();
+    if (user?.role_id?.role_name === "Teacher") {
+      getClassByOwner();
+    }
   }, [user?._id]);
 
   return (

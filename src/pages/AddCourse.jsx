@@ -55,6 +55,7 @@ const AddCourse = () => {
   const validationSchema = Yup.object().shape({
     class_name: Yup.string().required("Vui lòng nhập tên lớp học"),
     class_code: Yup.string().required("Vui lòng nhập mã lớp học"),
+    class_pass: Yup.string().required("Vui lòng nhập mật khẩu cho lớp học"),
     display: Yup.string().required("Vui lòng chọn hiển thị lớp học"),
     department: Yup.string().required("Vui lòng chọn khoa"),
     course_id: Yup.string().required("Vui lòng chọn khóa học"),

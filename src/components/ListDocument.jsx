@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Checkbox, List, ListItem, Stack } from "@mui/material";
+import { Card, Checkbox, List, ListItem, Stack } from "@mui/material";
 import { Fragment, useState } from "react";
 
 import { default as React } from "react";
@@ -262,12 +262,6 @@ const ListDocument = () => {
 
   return (
     <>
-      <div className="flex gap-1 items-end my-8">
-        <img src="../../src/assets/icons/icon.svg" alt="" />
-        <Link className="text-sm text-second hover:text-black">
-          Các thông báo
-        </Link>
-      </div>
       <div className="my-4">
         <div className="mb-10">
           {user?._id === classes?.owner && (

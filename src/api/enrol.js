@@ -45,3 +45,15 @@ export const apiCreateEnrol = async (data) => {
   }
 };
 
+export const apiAddStudentToClass = async (data) => {
+  try {
+    return instance({
+      method: "POST",
+      url: `/api/enrol/add-student-to-class`,
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+

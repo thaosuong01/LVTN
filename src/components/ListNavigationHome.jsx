@@ -60,7 +60,7 @@ const NavigationItem = ({ label, pathData, children = [] }) => {
                   <ListItemButton
                     key={idx}
                     component={Link}
-                    to={`/${path.CLASSPAGE}/${item?.class_id?._id}`}
+                    to={`/${path.CLASSPAGE}/${item?._id}`}
                   >
                     <Typography variant="body1" sx={{ fontSize: "14px" }}>
                       {user?.role_id?.role_name === "Student"

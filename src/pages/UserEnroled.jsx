@@ -12,6 +12,7 @@ import {
 import RightNavigate from "../components/RightNavigate";
 import { apiGetCourseByID } from "../api/course";
 import { path } from "../utils/path";
+import ModalAddUser from "../components/ModalAddUser";
 
 const UserEnroled = () => {
   const actionButton = (params) => (
@@ -42,6 +43,7 @@ const UserEnroled = () => {
     {
       field: "action",
       headerName: "Action",
+      disableExport: true,
       sortable: false,
       filterable: false,
       width: 180,
@@ -51,7 +53,7 @@ const UserEnroled = () => {
 
   const { cid } = useParams();
 
-  const [classes, setClasses] = useState();
+  const [classes, setClasses] = useState([]);
   console.log("classes: ", classes);
 
   useEffect(() => {
@@ -63,20 +65,21 @@ const UserEnroled = () => {
     getClass();
   }, [cid]);
 
-  const [course, setCourse] = useState();
+  const [course, setCourse] = useState([]);
+  const course_id = classes?.course_id?._id;
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await apiGetCourseByID(classes?.course_id?._id);
-        setCourse(response.data);
+        const response = await apiGetCourseByID(course_id);
+        setCourse(response?.data);
       } catch (error) {
         console.log(error);
       }
     };
 
     fetchCourse();
-  }, [classes?.course_id?._id]);
+  }, [course_id]);
 
   const [userEnrol, setUserEnrol] = useState([]);
 
@@ -112,6 +115,16 @@ const UserEnroled = () => {
     });
   };
 
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    fetchUserEnroledById();
+  };
+
   return (
     <>
       <div className="bg-white py-8">
@@ -138,12 +151,28 @@ const UserEnroled = () => {
               <Box
                 display={"flex"}
                 justifyContent={"space-between"}
+                alignItems={"center"}
                 marginBottom={2}
                 paddingTop={4}
               >
-                <Typography variant="h6" color="initial" fontWeight={"bold"}>
-                  Người dùng đã ghi danh
-                </Typography>
+                <div>
+                  <Typography variant="h6" color="initial" fontWeight={"bold"}>
+                    Sinh viên đã ghi danh
+                  </Typography>
+                  <Typography variant="h11" color="initial">
+                    Sỉ số: {userEnrol?.length}
+                  </Typography>
+                </div>
+                <Button
+                  onClick={() => handleOpenModal()}
+                  sx={{
+                    backgroundColor: "#90c446",
+                    "&:hover": { backgroundColor: "#5b9608" },
+                    color: "white",
+                  }}
+                >
+                  Thêm sinh viên
+                </Button>
               </Box>
             </div>
             <Container maxWidth={"lg"}>
@@ -165,7 +194,7 @@ const UserEnroled = () => {
                       showQuickFilter: true,
                       csvOptions: {
                         utf8WithBom: true,
-                        fileName: "Danh-sach-ket-qua",
+                        fileName: "Danh-sach-sinh-vien",
                         delimiter: ",",
                       },
                     },
@@ -200,6 +229,14 @@ const UserEnroled = () => {
           </div>
         </div>
       </div>
+
+      {openModal && (
+        <ModalAddUser
+          handleClose={handleCloseModal}
+          open={openModal}
+          classId={classes?._id}
+        />
+      )}
     </>
   );
 };

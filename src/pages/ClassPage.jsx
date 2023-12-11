@@ -24,7 +24,6 @@ const ClassPage = () => {
   const { cid } = useParams();
 
   const [classes, setClasses] = useState();
-  console.log('classes: ', classes);
   useEffect(() => {
     async function getClass() {
       const response = await apiGetClassById(cid);

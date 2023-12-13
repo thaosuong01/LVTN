@@ -64,7 +64,7 @@ app.use((error, req, res, next) => {
   // console.log("error: ", error);
   const message = error.message || "Error Server!";
   const statusCode = error.statusCode || 500;
-  res.status(statusCode).json({
+  return res.status(statusCode).json({
     message,
   });
 });

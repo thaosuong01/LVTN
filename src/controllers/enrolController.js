@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import Account from "../models/Account.js";
 
+// Sinh viên tự ghi danh vào lớp học
 export const enrolmentController = async (req, res, next) => {
   try {
     const { user_id } = req.account;
@@ -39,6 +40,7 @@ export const enrolmentController = async (req, res, next) => {
   }
 };
 
+// Giáo viên thêm sinh viên vào lớp học
 export const addStudentToClass = async (req, res, next) => {
   try {
     const { class_id, username } = req.body;
@@ -78,6 +80,7 @@ export const addStudentToClass = async (req, res, next) => {
   }
 };
 
+// Lấy ra danh sách sinh viên đã enrol vào lớp học nào đó
 export const getEnrolledStudents = async (req, res, next) => {
   try {
     const { cid } = await req.params;
@@ -97,6 +100,7 @@ export const getEnrolledStudents = async (req, res, next) => {
   }
 };
 
+// Sinh viên lấy ra danh sách lớp mà mình đã enrol
 export const getClassEnrolOfStudent = async (req, res, next) => {
   try {
     const { user_id } = await req.account;
@@ -127,6 +131,7 @@ export const getClassEnrolOfStudent = async (req, res, next) => {
   }
 };
 
+//Gv xóa ghi danh sinh viên ra khỏi lớp học
 export const removeEnrollment = async (req, res, next) => {
   try {
     const enrollmentId = req.params.eid;
@@ -140,6 +145,38 @@ export const removeEnrollment = async (req, res, next) => {
     return res.status(200).json({ message: "Enrollment removed successfully" });
   } catch (error) {
     console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
+// Kiểm tra sinh viên đã ghi danh vào lớp học ... chưa
+export const checkEnrol = async (req, res, next) => {
+  try {
+    const { class_id } = req.params;
+    const { user_id } = await req.account;
+
+    if (!user_id || !class_id) {
+      throw new ApiError(400, "Missing input");
+    }
+
+    const enroledStudent = await Enrol.findOne({
+      user_id,
+      class_id,
+    });
+
+    if (!enroledStudent) {
+      return res.status(200).json({
+        result: 0,
+        message: "Sinh viên chưa ghi danh",
+      });
+    }
+
+    return res.status(200).json({
+      result: 1,
+      message: "Sinh viên đã ghi danh",
+      enrol_id: enroledStudent._id,
+    });
+  } catch (error) {
     next(new ApiError(500, error.message));
   }
 };

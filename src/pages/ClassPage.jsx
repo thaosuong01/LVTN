@@ -1,7 +1,7 @@
 import { Breadcrumbs, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { TransitionGroup } from "react-transition-group";
 import { apiGetClassById } from "../api/class";
 import ListDocument from "../components/ListDocument";
@@ -9,9 +9,16 @@ import RightNavigate from "../components/RightNavigate";
 import { toggleEditMode } from "../redux/courseSlice";
 import { apiGetCourseByID } from "../api/course";
 import { path } from "../utils/path";
+import {
+  apiCheckEnrol,
+  apiDeleteStudentEnroled,
+  apiGetUserEnroledByClass,
+} from "../api/enrol";
+import Swal from "sweetalert2";
 
 const ClassPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { isEditMode } = useSelector((state) => state.course);
 
@@ -24,6 +31,8 @@ const ClassPage = () => {
   const { cid } = useParams();
 
   const [classes, setClasses] = useState();
+  const [enrolId, setEnrolId] = useState(null);
+
   useEffect(() => {
     async function getClass() {
       const response = await apiGetClassById(cid);
@@ -33,18 +42,33 @@ const ClassPage = () => {
     getClass();
   }, [cid]);
 
-  // const [course, setCourse] = useState();
-  // useEffect(() => {
-  //   async function fetchCourse() {
-  //     const courseId = await classes?.course_id?._id;
-  //     const response = await apiGetCourseByID(courseId);
-  //     setCourse(response?.data);
-  //   }
+  //Check enroled
+  const checkEnrol = async (cid) => {
+    try {
+      if (user && user?.role_id?.role_name === "Student") {
+        const response = await apiCheckEnrol(cid);
+        if (!response?.data?.result) {
+          navigate(`/${path.COURSE}/${classes?.course_id?._id}`);
+        } else {
+          setEnrolId(response.data?.enrol_id);
+        }
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+  useEffect(() => {
+    checkEnrol(cid);
+  }, [user, cid]);
 
-  //   fetchCourse();
-  // }, [cid]);
-
-  // const did = course?.department_id?._id;
+  const handleRemoveEnrol = async () => {
+    const response = await apiDeleteStudentEnroled(enrolId);
+    if (response.status === 200) {
+      Swal.fire("Xóa ghi danh thành công").then(() => {
+        navigate(`/${path.COURSE}/${classes?.course_id?._id}`);
+      });
+    }
+  };
 
   return (
     <>
@@ -60,7 +84,7 @@ const ClassPage = () => {
               </Link>
               <Link
                 className="text-second hover:text-black"
-                to={`/${path.LISTDEPARTMENT}`}
+                to={`/${path.COURSE}/${classes?.course_id?._id}`}
               >
                 {classes?.course_id?.course_name}
               </Link>
@@ -71,6 +95,22 @@ const ClassPage = () => {
             <TransitionGroup>
               <ListDocument></ListDocument>
             </TransitionGroup>
+            <div className="flex justify-center">
+              {user?.role_id?.role_name === "Student" && (
+                <Button
+                  sx={{
+                    backgroundColor: "#90c446",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#5b9608" },
+                    borderRadius: 0,
+                    mb: 2,
+                  }}
+                  onClick={handleRemoveEnrol}
+                >
+                  Rút khỏi lớp học
+                </Button>
+              )}
+            </div>
           </div>
           <div className="w-[20%]">
             <div>

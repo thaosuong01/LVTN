@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import RightNavigate from "../components/RightNavigate";
-import { FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput } from "@mui/material";
+import {
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiGetClassById } from "../api/class";
 import { apiCreateEnrol } from "../api/enrol";
@@ -31,7 +37,6 @@ const EnrolmentPage = () => {
 
   const onSubmit = async (values) => {
     values.class_id = cid;
-    console.log("values: ", values);
 
     try {
       const response = await apiCreateEnrol(values);

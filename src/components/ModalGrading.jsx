@@ -28,8 +28,14 @@ const style = {
   p: 4,
 };
 
-const ModalGrading = ({ open, handleClose, exerciseId }) => {
-  const [exerciseSubmit, setExerciseSubmit] = useState([]);
+const ModalGrading = ({
+  open,
+  handleClose,
+  exerciseId,
+  fetchExerciseSubmits,
+  pid,
+}) => {
+  const [exerciseSubmit, setExerciseSubmit] = useState({});
   console.log("exerciseSubmit: ", exerciseSubmit);
 
   const fetchGetExerciseSubmitById = async () => {
@@ -41,7 +47,10 @@ const ModalGrading = ({ open, handleClose, exerciseId }) => {
     fetchGetExerciseSubmitById();
   }, [exerciseId]);
 
-  const initialValues = { grade: "", comment: "" };
+  const initialValues = {
+    grade: exerciseSubmit?.grade || "",
+    comment: exerciseSubmit?.comment || "",
+  };
 
   const onSubmit = async (values) => {
     try {
@@ -50,6 +59,8 @@ const ModalGrading = ({ open, handleClose, exerciseId }) => {
         Swal.fire({
           text: "Đã chấm điểm!",
           confirmButtonColor: "#ffae00",
+        }).then(() => {
+          fetchExerciseSubmits(pid);
         });
 
         handleClose();
@@ -125,7 +136,6 @@ const ModalGrading = ({ open, handleClose, exerciseId }) => {
                   onSubmit={onSubmit}
                 >
                   {({ values, handleSubmit, handleChange, errors }) => {
-                    console.log("errors: ", errors);
                     return (
                       <form onSubmit={handleSubmit}>
                         <div className="flex justify-center items-center my-2">

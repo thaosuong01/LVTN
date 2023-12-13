@@ -33,6 +33,18 @@ export const apiGetClassEnrolOfStudent = async (id) => {
   }
 };
 
+// Check enrol - GET
+export const apiCheckEnrol = async (class_id) => {
+  try {
+    return instance({
+      method: "GET",
+      url: `/api/enrol/check-enrol/${class_id}`,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const apiCreateEnrol = async (data) => {
   try {
     return instance({
@@ -56,4 +68,3 @@ export const apiAddStudentToClass = async (data) => {
     console.log(error);
   }
 };
-

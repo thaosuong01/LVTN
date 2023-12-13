@@ -14,6 +14,7 @@ import ModalSubmitExercise from "../components/ModalSubmitExercise";
 import ModalGrading from "../components/ModalGrading";
 import RightNavigate from "../components/RightNavigate";
 import CreateIcon from "@mui/icons-material/Create";
+import { VisibilityOutlined } from "@mui/icons-material";
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -22,7 +23,6 @@ const PracticePage = () => {
   const { user } = useSelector((state) => state.user);
   const { pid } = useParams();
   const [exercise, setExercise] = useState({});
-  console.log("exercise: ", dayjs(exercise?.start_time) < Date.now());
   const [exerciseSubmit, setExerciseSubmit] = useState([]);
 
   const [openModalSubmit, setOpenModalSubmit] = useState(false);
@@ -69,7 +69,6 @@ const PracticePage = () => {
     setOpenModalSubmit(false);
   };
   const handleOpenModalEditSubmit = (id) => {
-    console.log("id: ", id);
     setOpenModalEditSubmit(true);
   };
 
@@ -97,17 +96,16 @@ const PracticePage = () => {
     const deadline = dayjs(exercise.deadline);
     const time_submit = dayjs(data.time_submit);
     let status;
-
     if (time_submit.isAfter(deadline)) {
       status = "Nộp muộn";
     } else {
       status = "Đã nộp";
     }
-    exerciseSubmit?.map((submit) => {
-      if (submit?.grade) {
-        status = "Đã chấm điểm";
-      }
-    });
+
+    if (data.grade) {
+      status = "Đã chấm điểm";
+    }
+
     return status;
   };
 
@@ -125,7 +123,11 @@ const PracticePage = () => {
 
   const actionButton = (params) => (
     <Button onClick={() => handleOpenModalGrading(params.row._id)}>
-      <CreateIcon className="text-primary" />
+      {params?.row?.grade ? (
+        <VisibilityOutlined className="text-primary" />
+      ) : (
+        <CreateIcon className="text-primary" />
+      )}
     </Button>
   );
 
@@ -137,8 +139,9 @@ const PracticePage = () => {
     setOpenModalGrading(true);
   };
 
-  const handleCloseModalGrading = () => {
+  const handleCloseModalGrading = (pid) => {
     setOpenModalGrading(false);
+    fetchExerciseSubmits(pid);
   };
 
   const columns = [
@@ -409,8 +412,9 @@ const PracticePage = () => {
       {openModalGrading && (
         <ModalGrading
           open={openModalGrading}
-          pid={pid}
           exerciseId={exerciseId}
+          fetchExerciseSubmits={fetchExerciseSubmits}
+          pid={pid}
           handleClose={handleCloseModalGrading}
         />
       )}

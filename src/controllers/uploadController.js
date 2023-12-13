@@ -31,7 +31,7 @@ export const uploadDocument = async (req, res, next) => {
       console.log("emails: ", emails);
       const html = `Giáo viên vừa thêm ${title} vào lớp <b>${students[0].class_id.class_name}</b>. Click vào <a href="http://localhost:5173/course/class/${class_id}">Link</a> để xem chi tiết.`;
 
-      const rs = await sendMail({ html });
+      const rs = await sendMail({ html,emails });
       console.log("rs: ", rs);
       rs.accepted.length > 0 &&
         console.log("Gửi mail thành công cho: " + rs.accepted);

@@ -166,6 +166,8 @@ export const createManyStudent = async (req, res, next) => {
 
     await Promise.all(
       data.map(async (item) => {
+        console.log("item: ", item);
+        // throw new ApiError(400, "Maintain system");
         const existUser = await Account.findOne({ username: item?.username });
 
         if (existUser) {
@@ -173,7 +175,7 @@ export const createManyStudent = async (req, res, next) => {
         }
 
         const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(item?.password, salt);
+        const passwordHash = await bcrypt.hash(item?.password + "", salt);
 
         const newAccount = await Account.create({
           username: item?.username,

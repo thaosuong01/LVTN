@@ -51,7 +51,7 @@ export const createExerciseController = async (req, res, next) => {
       const emails = students?.map((student) => student.user_id.email);
       const html = `Giáo viên vừa thêm ${title} vào lớp <b>${students[0].class_id.class_name}</b>. Click vào <a href="http://localhost:5173/course/class/${class_id}">Link</a> để xem chi tiết.`;
 
-      const rs = await sendMail({ html });
+      const rs = await sendMail({ html,emails });
       rs.accepted.length > 0 &&
         console.log("Gửi mail thành công cho: " + rs.accepted);
       rs.rejected.length > 0 &&
@@ -83,20 +83,20 @@ export const updateExerciseController = async (req, res, next) => {
     }
 
     // Kiểm tra xem tên bài tập có trùng với các bài tập khác hay không
-    const exerciseExist = await Exercise.findOne({
-      title,
-      _id: { $ne: eid },
-    });
-    if (exerciseExist) {
-      if (file_name?.length > 0) {
-        for (const file of file_name) {
-          fs.unlink(`src/uploads/exercises/${file}`, (err) => {
-            if (err) throw err;
-          });
-        }
-      }
-      throw new ApiError(409, "Title already exists");
-    }
+    // const exerciseExist = await Exercise.findOne({
+    //   title,
+    //   _id: { $ne: eid },
+    // });
+    // if (exerciseExist) {
+    //   if (file_name?.length > 0) {
+    //     for (const file of file_name) {
+    //       fs.unlink(`src/uploads/exercises/${file}`, (err) => {
+    //         if (err) throw err;
+    //       });
+    //     }
+    //   }
+    //   throw new ApiError(409, "Title already exists");
+    // }
 
     // Lưu trữ danh sách tệp tin cũ
 

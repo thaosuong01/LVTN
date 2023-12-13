@@ -3,11 +3,11 @@ import nodemailer from "nodemailer";
 
 const sendMail = async ({ emails, html }) => {
   try {
-    const emails = [
-      "nhanchidanh@gmail.com",
-      "danhb1910196@student.ctu.edu.vn",
-      "suongb1910289@student.ctu.edu.vn",
-    ];
+    // const emails = [
+    //   "nhanchidanh@gmail.com",
+    //   "danhb1910196@student.ctu.edu.vn",
+    //   "suongb1910289@student.ctu.edu.vn",
+    // ];
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({

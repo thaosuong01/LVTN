@@ -1,6 +1,7 @@
 import { ApiError } from "../middlewares/api-error.js";
 import bcrypt from "bcrypt";
 import Class from "../models/Class.js";
+import { Types } from "mongoose";
 
 export const createClassController = async (req, res, next) => {
   try {
@@ -132,10 +133,9 @@ export const getClassInCourseController = async (req, res, next) => {
   try {
     const course_id = await req.params.cid;
 
-    const getClass = await Class.find({ course_id: course_id }).populate(
-      "owner",
-      "fullname"
-    );
+    const getClass = await Class.find({
+      course_id: new Types.ObjectId(course_id),
+    }).populate("owner", "fullname");
 
     return res.status(200).json(getClass);
   } catch (error) {

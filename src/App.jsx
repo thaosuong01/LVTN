@@ -20,6 +20,7 @@ import UpdatePractice from "./pages/UpdatePractice";
 import ListCourseOfTeacher from "./pages/ListCourseOfTeacher";
 import EnrolmentPage from "./pages/EnrolmentPage";
 import ListMyCourse from "./pages/ListMyCourse";
+import ExamPage from "./pages/ExamPage";
 
 function App() {
   return (
@@ -46,10 +47,7 @@ function App() {
           <Route path={path.LISTDEPARTMENT} element={<Department />} />
           <Route path={`${path.USERENROLED}/:cid`} element={<UserEnroled />} />
           <Route path={path.CREATEPRACTICE} element={<CreatePractice />} />
-          <Route
-            path={`/${path.UPDATEPRACTICE}/:eid`}
-            element={<UpdatePractice />}
-          />
+          <Route path={path.UPDATEPRACTICE} element={<UpdatePractice />} />
           <Route
             path={`${path.PRACTICEPAGE}/:pid`}
             element={<PracticePage />}
@@ -58,6 +56,7 @@ function App() {
             path={`${path.MANAGECOURSE}/:did`}
             element={<ManageCourse />}
           />
+          <Route path={`${path.EXAM}`} element={<ExamPage />} />
         </Route>
         <Route path={path.NOTFOUND} element={<NotFoundPage />} />
       </Routes>

@@ -16,12 +16,13 @@ import dayjs from "dayjs";
 import { ErrorMessage, Formik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { apiGetExerciseById, apiUpdateExerciseById } from "../api/exercise";
 import RightNavigate from "../components/RightNavigate";
+import { path } from "../utils/path";
 
 export const fSlug = (text) =>
   slugify(text, {
@@ -41,6 +42,7 @@ export function renameFile(originalFile, newName) {
 }
 
 const UpdatePractice = () => {
+  const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   console.log("files: ", files);
   // const [rejected, setRejected] = useState([]);
@@ -81,7 +83,12 @@ const UpdatePractice = () => {
   //   setRejected((files) => files.filter(({ file }) => file.path !== path));
   // };
 
-  const { eid } = useParams();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const class_id = queryParams.get("class_id");
+  console.log('class_id: ', class_id);
+  const eid = queryParams.get("eid");
+  console.log('eid: ', eid);
 
   const [initialValues, setInitialValues] = useState({
     title: "",
@@ -177,6 +184,7 @@ const UpdatePractice = () => {
         }).then(() => {
           getExerciseById(eid);
           setFiles([]);
+          navigate(`/${path.CLASSPAGE}/${class_id}`);
         });
       }
     } catch (error) {
@@ -200,6 +208,7 @@ const UpdatePractice = () => {
     deadline_time: Yup.date().required("Vui lòng nhập hạn chót"),
     display: Yup.boolean().required("Vui lòng nhập hiển thị"),
   });
+
 
   return (
     <>
@@ -374,7 +383,7 @@ const UpdatePractice = () => {
                               type="submit"
                               className="ml-auto mt-1 text-[12px] uppercase tracking-wider font-bold text-neutral-500 border border-[#90c446] rounded-md px-3 hover:bg-[#5b9608] hover:text-white transition-colors"
                             >
-                              Upload Files
+                              Update
                             </button>
                           </div>
 

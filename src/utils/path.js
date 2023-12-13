@@ -17,4 +17,5 @@ export const path = {
   CREATEPRACTICE: "practice/create",
   UPDATEPRACTICE: "practice/update",
   FOLDER: "folder/document",
+  EXAM: 'exam'
 };

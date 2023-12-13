@@ -282,6 +282,23 @@ const ListDocument = () => {
               </Stack>
             </>
           )}
+          <List>
+            <ListItem>
+              {/* <Quiz
+                quiz={quizData}
+                shuffle
+                shuffleAnswer
+                // showInstantFeedback
+                // continueTillCorrect
+                onComplete={setQuizResult}
+                onQuestionSubmit={(obj) =>
+                  console.log("user question results:", obj)
+                }
+                disableSynopsis
+              /> */}
+              <Link to={"/exam"}>Kiểm tra</Link>
+            </ListItem>
+          </List>
 
           {topics?.map((topic, index) => (
             <Fragment key={index}>
@@ -421,7 +438,7 @@ const ListDocument = () => {
                             {editMode ? (
                               <div className="flex gap-2">
                                 <Link
-                                  to={`/${path.UPDATEPRACTICE}/${ex?._id}`}
+                                  to={`/${path.UPDATEPRACTICE}?class_id=${classes?._id}&eid=${ex?._id}`}
                                   className="text-sm text-primary hover:text-hover"
                                 >
                                   Chỉnh sửa

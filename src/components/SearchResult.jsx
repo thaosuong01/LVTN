@@ -9,8 +9,6 @@ const SearchResult = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [listClasses, setListClasses] = useState([]);
   const [course, setCourse] = useState({});
-  //   console.log("course: ", course);
-  //   console.log("listClasses: ", listClasses);
 
   const course_code = searchParams.get("search");
   const getListResult = async () => {

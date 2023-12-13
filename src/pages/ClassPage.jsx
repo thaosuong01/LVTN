@@ -48,7 +48,7 @@ const ClassPage = () => {
       if (user && user?.role_id?.role_name === "Student") {
         const response = await apiCheckEnrol(cid);
         if (!response?.data?.result) {
-          navigate(`/${path.COURSE}/${classes?.course_id?._id}`);
+          navigate(`/${path.ENROLMENTPAGE}/${cid}`);
         } else {
           setEnrolId(response.data?.enrol_id);
         }

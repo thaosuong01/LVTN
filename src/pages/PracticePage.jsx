@@ -212,7 +212,7 @@ const PracticePage = () => {
                           className="w-full hover:text-hover"
                           to={`${
                             import.meta.env.VITE_SERVER_URL
-                          }/exercise-submit/${file}`}
+                          }/exercises/${file}`}
                           key={index}
                         >
                           {file}
@@ -283,7 +283,7 @@ const PracticePage = () => {
                 </div>
 
                 <div className="flex justify-center">
-                  {exerciseOfStudent ? (
+                  {exerciseOfStudent && !exerciseOfStudent?.grade ? (
                     <button
                       onClick={() =>
                         handleOpenModalEditSubmit(exerciseOfStudent?._id)
@@ -293,7 +293,7 @@ const PracticePage = () => {
                     >
                       Chỉnh sửa
                     </button>
-                  ) : (
+                  ) : exerciseOfStudent && exerciseOfStudent?.grade ? null : (
                     <>
                       {dayjs(exercise?.start_time) < Date.now() && (
                         <button

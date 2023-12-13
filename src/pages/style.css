@@ -1,0 +1,11 @@
+.react-quiz-container {
+  max-width: 100% !important;
+  background: #fff;
+  padding: 20px;
+  margin: 0 !important;
+  height: 100%;
+}
+
+.filter-dropdown-select {
+  height: 38px !important;
+}

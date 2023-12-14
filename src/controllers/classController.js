@@ -85,7 +85,7 @@ export const updateClassController = async (req, res, next) => {
       await req.body;
 
     const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(class_pass, salt);
+    const passwordHash = class_pass && await bcrypt.hash(class_pass, salt);
 
     const update = await Class.findByIdAndUpdate(
       class_id,
@@ -148,7 +148,7 @@ export const getClassCreatedByOwner = async (req, res, next) => {
   try {
     const { user_id } = await req.account;
 
-    const classes = await Class.find({ owner: user_id });
+    const classes = await Class.find({ owner: user_id }).populate("course_id", "course_code course_name");
     return res.status(200).json(classes);
   } catch (error) {
     console.log(error);

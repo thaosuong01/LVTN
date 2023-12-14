@@ -13,6 +13,7 @@ import courseRoute from "./routes/courseRoute.js";
 import departmentRoute from "./routes/departmentRoute.js";
 import enrolRoute from "./routes/enrolRoute.js";
 import exerciseRoute from "./routes/exerciseRoute.js";
+import examSetRoute from "./routes/examSetRoute.js";
 import exerciseSubmitRoute from "./routes/exerciseSubmitRoute.js";
 import roleRoute from "./routes/roleRoute.js";
 import topicRoute from "./routes/topicRoute.js";
@@ -55,13 +56,14 @@ app.use("/api/upload", uploadRoute);
 app.use("/api/lecture", lectureRoute);
 app.use("/api/exercise", exerciseRoute);
 app.use("/api/exercise-submit", exerciseSubmitRoute);
+app.use("/api/exam-set", examSetRoute);
 
 app.use((req, res, next) => {
   return next(new ApiError(404, "Not found"));
 });
 
 app.use((error, req, res, next) => {
-  // console.log("error: ", error);
+  console.log("error: ", error);
   const message = error.message || "Error Server!";
   const statusCode = error.statusCode || 500;
   return res.status(statusCode).json({

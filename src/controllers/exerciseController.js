@@ -48,14 +48,14 @@ export const createExerciseController = async (req, res, next) => {
       const students = await Enrol.find({ class_id })
         .populate("user_id", "email")
         .populate("class_id");
-      const emails = students?.map((student) => student.user_id.email);
-      const html = `Giáo viên vừa thêm ${title} vào lớp <b>${students[0].class_id.class_name}</b>. Click vào <a href="http://localhost:5173/course/class/${class_id}">Link</a> để xem chi tiết.`;
+      const emails = students?.map((student) => student?.user_id?.email);
+      const html = `Giáo viên vừa thêm ${title} vào lớp <b>${students[0]?.class_id?.class_name}</b>. Click vào <a href="http://localhost:5173/course/class/${class_id}">Link</a> để xem chi tiết.`;
 
       const rs = await sendMail({ html,emails });
-      rs.accepted.length > 0 &&
-        console.log("Gửi mail thành công cho: " + rs.accepted);
-      rs.rejected.length > 0 &&
-        console.log("Gửi mail Thất bại cho: " + rs.rejected);
+      rs?.accepted?.length > 0 &&
+        console.log("Gửi mail thành công cho: " + rs?.accepted);
+      rs?.rejected?.length > 0 &&
+        console.log("Gửi mail Thất bại cho: " + rs?.rejected);
     }
 
     return res.status(201).json(exercise);

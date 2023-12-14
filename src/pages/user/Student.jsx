@@ -1,14 +1,87 @@
 import { AddCircleOutlined, Clear, EditOutlined } from '@mui/icons-material';
-import { Box, Button, Container, Typography, styled } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { Box, Button, Container, Stack, Typography, styled } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import {
+  DataGrid,
+  GridCsvExportMenuItem,
+  GridToolbarExportContainer,
+  gridFilteredSortedRowIdsSelector,
+  gridVisibleColumnFieldsSelector,
+  useGridApiContext
+} from '@mui/x-data-grid';
 import { apiCreateManyStudent, apiDeleteUser, apiGetListUser } from 'apis/user';
 import { Path } from 'constants/path';
+import Papa from 'papaparse';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import Papa from 'papaparse';
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+const getJson = (apiRef) => {
+  // Select rows and columns
+  const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
+  const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
+
+  // Format the data. Here we only keep the value
+  const data = filteredSortedRowIds.map((id) => {
+    const row = {};
+    visibleColumnsField.forEach((field) => {
+      row[field] = apiRef.current.getCellParams(id, field).value;
+    });
+    return row;
+  });
+
+  // Stringify with some indentation
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#parameters
+  return JSON.stringify(data, null, 2);
+};
+
+const exportBlob = (blob, filename) => {
+  // Save the blob in a json file
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  });
+};
+
+function JsonExportMenuItem(props) {
+  const apiRef = useGridApiContext();
+
+  const { hideMenu } = props;
+
+  return (
+    <MenuItem
+      onClick={() => {
+        const jsonString = getJson(apiRef);
+        const blob = new Blob([jsonString], {
+          type: 'text/json'
+        });
+        exportBlob(blob, 'DataGrid_demo.json');
+
+        // Hide the export menu after the export
+        hideMenu?.();
+      }}
+    >
+      Export JSON
+    </MenuItem>
+  );
+}
+
+function CustomExportButton(props) {
+  return (
+    <GridToolbarExportContainer {...props}>
+      <GridCsvExportMenuItem options={{ delimiter: ',', allColumns: true, utf8WithBom: true }} />
+      <JsonExportMenuItem />
+    </GridToolbarExportContainer>
+  );
+}
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -54,6 +127,7 @@ const Student = () => {
     {
       field: 'action',
       headerName: '',
+      disableExport: true,
       sortable: false,
       filterable: false,
       width: 180,
@@ -113,19 +187,24 @@ const Student = () => {
       }
       Papa.parse(file, {
         // header: true,
+        dynamicTyping: true,
+        encoding: 'ISO-8859-1',
         complete: async function (result) {
           let rawCSV = result.data;
+          // console.log('rawCSV: ', rawCSV);
+          // return;
           if (rawCSV.length > 0) {
             if (rawCSV[0] && rawCSV[0].length === 4) {
-              if (rawCSV[0][0] !== 'fullname' || rawCSV[0][1] !== 'username' || rawCSV[0][2] !== 'email' || rawCSV[0][3] !== 'password') {
+              if (rawCSV[0][0] !== 'username' || rawCSV[0][1] !== 'fullname' || rawCSV[0][2] !== 'email' || rawCSV[0][3] !== 'password') {
                 Swal.fire({ text: 'Lỗi định dạng tiêu đề trong file csv' });
               } else {
                 let result = [];
+
                 rawCSV.map((item, index) => {
                   if (index > 0 && item.length === 4) {
                     let obj = {};
-                    obj.fullname = item[0];
-                    obj.username = item[1];
+                    obj.username = item[0];
+                    obj.fullname = item[1];
                     obj.email = item[2];
                     obj.password = item[3];
                     result.push(obj);
@@ -159,12 +238,12 @@ const Student = () => {
     <Container maxWidth={'lg'}>
       <Box display={'flex'} justifyContent={'space-between'} marginBottom={2}>
         <Typography variant="h2" color="initial">
-          Danh sách Sinh viên
+          Danh sách sinh viên
         </Typography>
 
-        <Box>
+        <Stack direction="row" spacing={2}>
           <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
-            Upload file
+            Import
             <VisuallyHiddenInput key={fileKey} onChange={(e) => HandleImportCSV(e)} type="file" />
           </Button>
           <Button
@@ -176,7 +255,7 @@ const Student = () => {
           >
             Thêm Sinh viên
           </Button>
-        </Box>
+        </Stack>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid
@@ -190,17 +269,7 @@ const Student = () => {
               }
             }
           }}
-          slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true
-            },
-            csvOptions: {
-              utf8WithBom: true,
-              fileName: 'Danh-sach-sinh-vien',
-              delimiter: ','
-            }
-          }}
+          slots={{ toolbar: CustomExportButton }}
           getRowId={(users) => users._id}
           pageSizeOptions={[5]}
           sx={{

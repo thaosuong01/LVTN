@@ -82,6 +82,7 @@ const Document = () => {
     });
   };
   const [documents, setDocuments] = useState([]);
+  console.log('documents: ', documents);
 
   document.title = 'Tài liệu và bài giảng';
 

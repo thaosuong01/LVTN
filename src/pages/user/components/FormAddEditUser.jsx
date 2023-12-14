@@ -35,13 +35,17 @@ const FormAddEditUser = ({ initialValues, onSubmit, isEditMode }) => {
 
   //Get list position
   const [roles, setRoles] = useState([]);
+  console.log('roles: ', roles);
 
   // Get list position
   useEffect(() => {
     const fetchRole = async () => {
       try {
         const response = await apiGetListRole();
-        setRoles(response?.data);
+        const data = response?.data.filter((item) => {
+           return item?.role_name !== 'Admin';
+        });
+        setRoles(data);
       } catch (error) {
         console.log('Failed to fetch position list: ', error);
       }

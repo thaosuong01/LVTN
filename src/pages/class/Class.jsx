@@ -38,7 +38,7 @@ const Class = () => {
     },
     {
       field: 'course_id',
-      headerName: 'Role',
+      headerName: 'Course',
       width: 240,
       valueGetter: (params) => params.row.course_id?.course_name
     },

@@ -81,7 +81,6 @@ const Teacher = () => {
   const fetchUser = async () => {
     try {
       const response = await apiGetListUser();
-      console.log('response?.data: ', response?.data);
       setUsers(response?.data?.filter((item) => item?.role_id?.role_name === 'Teacher'));
     } catch (error) {
       console.log('Failed to fetch user list: ', error);

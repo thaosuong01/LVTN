@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { path } from "../utils/path.js";
 import { useSelector } from "react-redux";
+import { number } from "yup";
 
 const NavigationItem = ({ label, pathData, children = [] }) => {
   const [open, setOpen] = useState(false);
@@ -57,22 +58,37 @@ const NavigationItem = ({ label, pathData, children = [] }) => {
                 );
               } else {
                 return (
-                  <ListItemButton
-                    key={idx}
-                    component={Link}
-                    to={`/${path.CLASSPAGE}/${item?._id}`}
-                  >
-                    <Typography variant="body1" sx={{ fontSize: "14px" }}>
-                      {user?.role_id?.role_name === "Student"
-                        ? item?.class_id?.course_id?.course_code +
-                          "" +
-                          item?.class_id?.class_code +
-                          "_" +
-                          item?.class_id?.class_name +
-                          ` (GV: ${item?.class_id?.owner?.fullname})`
-                        : item?.class_name + ` (${item?.class_code})`}
-                    </Typography>
-                  </ListItemButton>
+                  <>
+                    {user?.role_id?.role_name === "Student" ? (
+                      <ListItemButton
+                        key={idx}
+                        component={Link}
+                        to={`/${path.CLASSPAGE}/${item?.class_id?._id}`}
+                      >
+                        <Typography variant="body1" sx={{ fontSize: "14px" }}>
+                          {item?.class_id?.course_id?.course_code +
+                            "" +
+                            item?.class_id?.class_code +
+                            "_" +
+                            item?.class_id?.class_name +
+                            ` (GV: ${item?.class_id?.owner?.fullname})`}
+                        </Typography>
+                      </ListItemButton>
+                    ) : (
+                      <ListItemButton
+                        key={idx}
+                        component={Link}
+                        to={`/${path.CLASSPAGE}/${item?._id}`}
+                      >
+                        <Typography variant="body1" sx={{ fontSize: "14px" }}>
+                          {item?.course_id?.course_code +
+                            "_" +
+                            item?.class_name +
+                            ` (${item?.class_code})`}
+                        </Typography>
+                      </ListItemButton>
+                    )}
+                  </>
                 );
               }
             })}

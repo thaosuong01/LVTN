@@ -56,7 +56,7 @@ function App() {
             path={`${path.MANAGECOURSE}/:did`}
             element={<ManageCourse />}
           />
-          <Route path={`${path.EXAM}`} element={<ExamPage />} />
+          <Route path={`${path.EXAM}/:exam_id`} element={<ExamPage />} />
         </Route>
         <Route path={path.NOTFOUND} element={<NotFoundPage />} />
       </Routes>

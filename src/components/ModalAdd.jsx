@@ -6,13 +6,14 @@ import { Link } from "react-router-dom";
 import { path } from "../utils/path";
 import UploadDocument from "./UploadDocument";
 import UploadLecture from "./UploadLecture";
+import ExamSet from "./ExamSet";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 500,
   bgcolor: "background.paper",
   border: "none",
   boxShadow: 24,
@@ -36,6 +37,15 @@ const ModalAdd = ({ handleClose, topicId, classId, open, onClose }) => {
 
   const handleCloseModalUploadLecture = () => {
     setOpenModalUploadLecture(false);
+  };
+
+  const [openModalExamSet, setOpenModalExamSet] = useState(false);
+  const handleOpenModalExamSet = () => {
+    setOpenModalExamSet(true);
+  };
+
+  const handleCloseModalExamSet = () => {
+    setOpenModalExamSet(false);
   };
 
   return (
@@ -120,6 +130,17 @@ const ModalAdd = ({ handleClose, topicId, classId, open, onClose }) => {
                     <span>Bài tập</span>
                   </div>
                 </Link>
+                <div
+                  onClick={() => handleOpenModalExamSet()}
+                  className="cursor-pointer hover:text-hover text-black flex flex-col items-center"
+                >
+                  <img
+                    src="/../src/assets/icons/exam.png"
+                    alt=""
+                    className="w-20"
+                  />
+                  <span>Mini test</span>
+                </div>
               </div>
             </div>
           </div>
@@ -141,6 +162,15 @@ const ModalAdd = ({ handleClose, topicId, classId, open, onClose }) => {
           classId={classId}
           topicId={topicId}
           open={openModalUploadLecture}
+          onClose={onClose}
+        />
+      )}
+      {openModalExamSet && (
+        <ExamSet
+          handleClose={handleCloseModalExamSet}
+          classId={classId}
+          topicId={topicId}
+          open={openModalExamSet}
           onClose={onClose}
         />
       )}

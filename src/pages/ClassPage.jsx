@@ -43,23 +43,23 @@ const ClassPage = () => {
   }, [cid]);
 
   //Check enroled
-  const checkEnrol = async (cid) => {
-    try {
-      if (user && user?.role_id?.role_name === "Student") {
-        const response = await apiCheckEnrol(cid);
-        if (!response?.data?.result) {
-          navigate(`/${path.ENROLMENTPAGE}/${cid}`);
-        } else {
-          setEnrolId(response.data?.enrol_id);
-        }
-      }
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
-  useEffect(() => {
-    checkEnrol(cid);
-  }, [user, cid]);
+  // const checkEnrol = async (cid) => {
+  //   try {
+  //     if (user && user?.role_id?.role_name === "Student") {
+  //       const response = await apiCheckEnrol(cid);
+  //       if (!response?.data?.result) {
+  //         navigate(`/${path.ENROLMENTPAGE}/${cid}`);
+  //       } else {
+  //         setEnrolId(response.data?.enrol_id);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log("error: ", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   checkEnrol(cid);
+  // }, [user, cid]);
 
   const handleRemoveEnrol = async () => {
     const response = await apiDeleteStudentEnroled(enrolId);

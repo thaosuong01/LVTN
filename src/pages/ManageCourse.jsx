@@ -17,33 +17,22 @@ import { path } from "../utils/path";
 const ManageCourse = () => {
   const { user } = useSelector((state) => state.user);
 
-  const [activeIconIndex, setActiveIconIndex] = useState([]);
-
-  const handleClick = async (index) => {
-    let _activeIconIndex = [...activeIconIndex];
-
-    try {
-      if (_activeIconIndex.includes(index)) {
-        _activeIconIndex = _activeIconIndex.filter((i) => i !== index);
-      } else {
-        _activeIconIndex = [..._activeIconIndex, index];
-      }
-
-      const updatedClass = {
-        display: _activeIconIndex.includes(index),
-      };
-
-      setActiveIconIndex(_activeIconIndex);
-      const response = await apiUpdateClass(updatedClass, index);
-      console.log("response: ", response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // useEffect(() => {
+  //   // Retrieve the display status from local storage
+  //   const storedDisplayStatus = localStorage.getItem("displayStatus");
+  //   if (storedDisplayStatus) {
+  //     setDisplayStatus(JSON.parse(storedDisplayStatus));
+  //     console.log(
+  //       "Retrieved display status from local storage:",
+  //       JSON.parse(storedDisplayStatus)
+  //     );
+  //   }
+  // }, []);
 
   const [department, setDepartment] = useState([]);
   const [courses, setCourses] = useState([]);
   const [classes, setClasses] = useState([]);
+  console.log("classes: ", classes);
 
   const { did } = useParams();
 
@@ -84,6 +73,8 @@ const ManageCourse = () => {
         allClasses.push(...classData);
       }
 
+      setDisplayStatus(allClasses?.map(item => item.display))
+
       setClasses(allClasses);
 
       return allClasses;
@@ -93,13 +84,30 @@ const ManageCourse = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      const dataClasses = await fetchClasses();
-      setActiveIconIndex(
-        dataClasses?.filter((d) => d.display).map((v) => v._id)
-      );
-    })();
+    fetchClasses();
   }, [courses]);
+
+  const [displayStatus, setDisplayStatus] = useState(
+    classes?.map((item) => item?.display)
+  ); // Assuming the initial display status is true
+  console.log("displayStatus: ", displayStatus);
+
+  const handleClick = async (classId, dataDisplay) => {
+    try {
+      // const updatedDisplayStatus = !displayStatus; // Toggle the display status
+
+      setDisplayStatus(!displayStatus);
+
+      // Update the class display status via API
+      const response = await apiUpdateClass({ display: !dataDisplay }, classId); // Replace classId with the actual class identifier
+      console.log("Class display status updated:", response);
+      if (response.status === 201) {
+        fetchClasses()
+      }
+    } catch (error) {
+      console.error("Error updating class display status:", error);
+    }
+  };
 
   const [open, setOpen] = useState(false);
   const [openClassId, setOpenClassId] = useState(null);
@@ -185,7 +193,7 @@ const ManageCourse = () => {
                 />
               </Stack>
             </div> */}
-            {classes.map((item) => (
+            {classes.map((item, index) => (
               <List key={item?._id}>
                 <ListItem className="flex items-center">
                   <div className="flex items-center w-full">
@@ -220,18 +228,7 @@ const ManageCourse = () => {
                             onClick={() => handleDelete(item?._id)}
                           />
 
-                          {!activeIconIndex.includes(item?._id) ? (
-                            <VisibilityOffIcon
-                              sx={{
-                                fontSize: "20px",
-                                cursor: "pointer",
-                                "&:hover": { color: "#ffae00" },
-                                transition: "ease-in-out",
-                                transitionDuration: ".3s",
-                              }}
-                              onClick={() => handleClick(item?._id)}
-                            />
-                          ) : (
+                          {displayStatus[index] ? (
                             <VisibilityIcon
                               sx={{
                                 fontSize: "20px",
@@ -240,7 +237,20 @@ const ManageCourse = () => {
                                 transition: "ease-in-out",
                                 transitionDuration: ".3s",
                               }}
-                              onClick={() => handleClick(item?._id)}
+                              onClick={() => handleClick(item?._id,item?.display)}
+                            />
+                          ) : (
+                            <VisibilityOffIcon
+                              sx={{
+                                fontSize: "20px",
+                                cursor: "pointer",
+                                "&:hover": { color: "#ffae00" },
+                                transition: "ease-in-out",
+                                transitionDuration: ".3s",
+                              }}
+                              onClick={() =>
+                                handleClick(item?._id, item?.display)
+                              }
                             />
                           )}
                         </Fragment>

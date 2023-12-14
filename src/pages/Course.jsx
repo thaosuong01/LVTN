@@ -35,7 +35,7 @@ const Course = () => {
   useEffect(() => {
     async function getClass() {
       const response = await apiGetClass(cid);
-      setClasses(response?.data);
+      setClasses(response?.data?.filter(item => item.display));
     }
 
     getClass();
@@ -87,47 +87,50 @@ const Course = () => {
             </Breadcrumbs>
 
             <List sx={{ my: 4 }}>
-              {classes?.map((item) => (
-                <Fragment key={item._id}>
-                  <ListItem className="flex items-center hover:bg-[#ddd] transition-all ease-in-out duration-150 cursor-pointer">
-                    <div className="flex items-center justify-between w-full">
-                      <div>
-                        <LoginIcon sx={{ color: "#555", mr: 2 }} />
-                        <span
-                          onClick={() => handleClick(item?._id)}
-                          className="w-[80%]"
-                        >
-                          <span className="mr-2">{item?.class_name}</span>
-                          <span>{item?.class_code}</span>
-                        </span>
-                      </div>
-                      <div>
-                        <InfoOutlinedIcon
-                          sx={{ color: "#555", cursor: "pointer" }}
-                          onClick={() => handleInfoClick(item)}
-                        />
-                      </div>
-                    </div>
-                  </ListItem>
-                  <>
-                    {selectedClasses.includes(item) && (
-                      <div className="p-4">
-                        <Typography variant="body2" color="textSecondary">
-                          Teacher:
-                          <span className="text-[#1c57a5] ml-1">
-                            {item?.owner?.fullname}
+              {classes?.map((item) => {
+                console.log("item: ", item);
+                return (
+                  <Fragment key={item._id}>
+                    <ListItem className="flex items-center hover:bg-[#ddd] transition-all ease-in-out duration-150 cursor-pointer">
+                      <div className="flex items-center justify-between w-full">
+                        <div>
+                          <LoginIcon sx={{ color: "#555", mr: 2 }} />
+                          <span
+                            onClick={() => handleClick(item?._id)}
+                            className="w-[80%]"
+                          >
+                            <span className="mr-2">{item?.class_name}</span>
+                            <span>{item?.class_code}</span>
                           </span>
-                        </Typography>
-                        <div className="mt-4">
-                          <Link className="hover:bg-[#FF9500] border bg-primary p-2 text-white transition-all ease-in-out duration-200">
-                            Click to enter this course
-                          </Link>
+                        </div>
+                        <div>
+                          <InfoOutlinedIcon
+                            sx={{ color: "#555", cursor: "pointer" }}
+                            onClick={() => handleInfoClick(item)}
+                          />
                         </div>
                       </div>
-                    )}
-                  </>
-                </Fragment>
-              ))}
+                    </ListItem>
+                    <>
+                      {selectedClasses.includes(item) && (
+                        <div className="p-4">
+                          <Typography variant="body2" color="textSecondary">
+                            Teacher:
+                            <span className="text-[#1c57a5] ml-1">
+                              {item?.owner?.fullname}
+                            </span>
+                          </Typography>
+                          <div className="mt-4">
+                            <Link className="hover:bg-[#FF9500] border bg-primary p-2 text-white transition-all ease-in-out duration-200">
+                              Click to enter this course
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  </Fragment>
+                );
+              })}
             </List>
           </div>
           <div className="w-[20%]">

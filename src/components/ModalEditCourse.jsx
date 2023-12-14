@@ -47,7 +47,9 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
       const response = await apiGetClassById(classId);
 
       setInitialValues({
-        ...response.data,
+        class_code:response.data.class_code,
+        class_name:response.data.class_name,
+        display:response.data.display,
         course_id: response.data.course_id._id,
       });
     } catch (error) {}
@@ -145,6 +147,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
                 onSubmit={onSubmit}
               >
                 {({ values, handleSubmit, handleChange, errors }) => {
+                  console.log('values: ', values);
                   
                   return (
                     <form onSubmit={handleSubmit}>
@@ -246,7 +249,7 @@ const ModalEditCourse = ({ handleClose, classId, open }) => {
                             className="w-[70%]"
                             name="display"
                             variant="outlined"
-                            value={values?.display || ""}
+                            value={values?.display || false}
                             onChange={handleChange}
                             error={Boolean(errors.display)}
                           >

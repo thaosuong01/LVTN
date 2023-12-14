@@ -150,7 +150,7 @@ const ManageCourse = () => {
               </Stack>
             </div>
             <List sx={{ my: 4 }}>
-              {classes?.map((item) => (
+              {classes?.display && classes?.map((item) => (
                 <Fragment key={item._id}>
                   <ListItem className="flex items-center hover:bg-[#ddd] transition-all ease-in-out duration-150 cursor-pointer">
                     <div className="flex items-center justify-between w-full">

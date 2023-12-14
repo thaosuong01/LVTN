@@ -24,6 +24,7 @@ import ModalEditDocument from "./ModalEditDocument";
 import ModalEditTopic from "./ModalEditTopic";
 import { apiDeleteLecture, apiGetLectureByClassId } from "../api/lecture";
 import ModalEditLecture from "./ModalEditLecture";
+import { apiGetAllExamSet, apiGetExamSetByClassId } from "../api/examSet";
 
 const ListDocument = () => {
   const { isEditMode: editMode } = useSelector((state) => state.course);
@@ -161,9 +162,26 @@ const ListDocument = () => {
     }
   };
 
+  // Fetch exam set
+  const [examSet, setExamSet] = useState();
+  console.log("examSet: ", examSet);
+
+  const getExamSetByClassId = async (cid) => {
+    try {
+      const response = await apiGetExamSetByClassId(cid);
+      console.log('response: ', response);
+      if (response.status === 200) {
+        setExamSet(response.data);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
   useEffect(() => {
     // Gọi hàm getDocumentsByClassId với cid hiện tại
     getExercisesByClassId(cid);
+    getExamSetByClassId(cid);
   }, [cid]);
 
   const handleDelete = (tid) => {
@@ -284,18 +302,6 @@ const ListDocument = () => {
           )}
           <List>
             <ListItem>
-              {/* <Quiz
-                quiz={quizData}
-                shuffle
-                shuffleAnswer
-                // showInstantFeedback
-                // continueTillCorrect
-                onComplete={setQuizResult}
-                onQuestionSubmit={(obj) =>
-                  console.log("user question results:", obj)
-                }
-                disableSynopsis
-              /> */}
               <Link to={"/exam"}>Kiểm tra</Link>
             </ListItem>
           </List>
@@ -501,6 +507,54 @@ const ListDocument = () => {
                       </ListItem>
                     </List>
                   );
+                }
+              })}
+
+              {examSet?.map((exam) => {
+                if (exam.topic_id === topic?._id) {
+                  if (
+                    classes?.owner === user?._id ||
+                    user?.role_id?.role_name === "Student"
+                  ) {
+                    return (
+                      <List key={exam?._id}>
+                        <ListItem disablePadding>
+                          <div className="flex justify-between w-full">
+                            <div className="flex gap-4 w-[80%] items-center">
+                              <img
+                                src="/../src/assets/icons/exam.png"
+                                alt="Folder"
+                                width={40}
+                              />
+                              <Link to={`/${path.EXAM}/${exam?._id}`}>
+                                {exam?.set_name}
+                              </Link>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end items-center w-[20%]  cursor-pointer">
+                            <Checkbox />
+                            {editMode ? (
+                              <div className="flex gap-2">
+                                <Link
+                                  to={`/${path.UPDATEPRACTICE}?class_id=${classes?._id}&eid=${exam?._id}`}
+                                  className="text-sm text-primary hover:text-hover"
+                                >
+                                  Chỉnh sửa
+                                </Link>
+                                <span
+                                  className="text-primary text-sm hover:text-hover"
+                                  onClick={() => handleDeleteExercise(exam._id)}
+                                >
+                                  Xóa
+                                </span>
+                              </div>
+                            ) : null}
+                          </div>
+                        </ListItem>
+                      </List>
+                    );
+                  }
                 }
               })}
             </Fragment>

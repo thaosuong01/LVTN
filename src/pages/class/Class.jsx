@@ -15,20 +15,28 @@ const Class = () => {
   );
 
   const columns = [
-    {
-      field: 'class_code',
-      headerName: 'Class Code',
-      width: 120
-    },
+    // {
+    //   field: 'class_code',
+    //   headerName: 'Class Code',
+    //   width: 120
+    // },
     {
       field: 'class_name',
       headerName: 'Class Name',
-      width: 260
+      width: 300,
+      valueGetter: params => {
+        return `${params?.row?.class_name} ${params?.row?.class_code}`
+      }
     },
     {
       field: 'display',
       headerName: 'Display',
-      width: 140
+      width: 140,
+      valueGetter: (params) => {
+        const isDisplay = params.row.display;
+  
+        return isDisplay ? 'Mở' : 'Đóng';
+      }
     },
     {
       field: 'owner',

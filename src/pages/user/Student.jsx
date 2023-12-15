@@ -5,6 +5,8 @@ import {
   DataGrid,
   GridCsvExportMenuItem,
   GridToolbarExportContainer,
+  GridToolbarFilterButton,
+  GridToolbarQuickFilter,
   gridFilteredSortedRowIdsSelector,
   gridVisibleColumnFieldsSelector,
   useGridApiContext
@@ -17,6 +19,7 @@ import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import dayjs from 'dayjs';
 
 const getJson = (apiRef) => {
   // Select rows and columns
@@ -111,7 +114,7 @@ const Student = () => {
     {
       field: 'account_id',
       headerName: 'Username',
-      width: 260,
+      width: 180,
       valueGetter: (params) => params.row.account_id?.username
     },
     {
@@ -122,7 +125,19 @@ const Student = () => {
     {
       field: 'email',
       headerName: 'Email',
-      width: 260
+      width: 280
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created_At',
+      width: 260,
+      valueFormatter: (params) => {
+        console.log('params: ', params);
+        if (params.value == null) {
+          return '';
+        }
+        return dayjs(params?.value).format('HH:mm:ss DD/MM/YYYY');
+      }
     },
     {
       field: 'action',
@@ -188,7 +203,7 @@ const Student = () => {
       Papa.parse(file, {
         // header: true,
         dynamicTyping: true,
-        encoding: 'ISO-8859-1',
+        encoding: 'UTF-8',
         complete: async function (result) {
           let rawCSV = result.data;
           // console.log('rawCSV: ', rawCSV);
@@ -269,7 +284,23 @@ const Student = () => {
               }
             }
           }}
-          slots={{ toolbar: CustomExportButton }}
+          // slots={{ toolbar: CustomExportButton }}
+          slots={{
+            toolbar: (props) => (
+              <Stack direction="row" justifyContent={'space-between'} spacing={2} alignItems="center">
+                <Box>
+                  <GridToolbarFilterButton {...props} />
+                  <CustomExportButton {...props} />
+                </Box>
+                <GridToolbarQuickFilter {...props} />
+              </Stack>
+            )
+          }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true
+            }
+          }}
           getRowId={(users) => users._id}
           pageSizeOptions={[5]}
           sx={{

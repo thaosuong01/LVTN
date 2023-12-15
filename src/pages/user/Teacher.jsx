@@ -3,6 +3,7 @@ import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { apiDeleteUser, apiGetListUser } from 'apis/user';
 import { Path } from 'constants/path';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -37,10 +38,16 @@ const Teacher = () => {
       width: 260
     },
     {
-      field: 'role_id',
-      headerName: 'Role',
-      width: 160,
-      valueGetter: (params) => params.row.role_id?.role_name
+      field: 'createdAt',
+      headerName: 'Created_At',
+      width: 260,
+      valueFormatter: (params) => {
+        console.log('params: ', params);
+        if (params.value == null) {
+          return '';
+        }
+        return dayjs(params?.value).format('HH:mm:ss DD/MM/YYYY');
+      }
     },
     {
       field: 'action',

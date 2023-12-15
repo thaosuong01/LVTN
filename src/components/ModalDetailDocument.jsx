@@ -86,7 +86,7 @@ const ModalDetailDocument = ({ open, handleClose, documentId }) => {
                     <Typography>Tên lớp:</Typography>
                   </Grid>
                   <Grid item xs={8}>
-                    {document?.class_id?.class_name}
+                    {document?.class_id?.class_name || '(Đã xóa)'}
                   </Grid>
                 </Grid>
               </div>

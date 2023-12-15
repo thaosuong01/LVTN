@@ -46,7 +46,7 @@ const Document = () => {
       field: 'class_id',
       headerName: 'Class Name',
       width: 260,
-      valueGetter: (params) => params.row.class_id?.class_name
+      valueGetter: (params) => params.row.class_id?.class_name || '(Đã xóa)'
     },
     {
       field: 'action',
@@ -82,7 +82,6 @@ const Document = () => {
     });
   };
   const [documents, setDocuments] = useState([]);
-  console.log('documents: ', documents);
 
   document.title = 'Tài liệu và bài giảng';
 

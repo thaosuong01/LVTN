@@ -1,6 +1,6 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LoginIcon from "@mui/icons-material/Login";
-import { List, ListItem, Pagination, Stack, Typography } from "@mui/material";
+import { List, ListItem, Typography } from "@mui/material";
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
@@ -38,6 +38,7 @@ const ManageCourse = () => {
 
   const [department, setDepartment] = useState([]);
   const [courses, setCourses] = useState([]);
+  console.log("courses: ", courses);
   const [classes, setClasses] = useState([]);
 
   const { did } = useParams();
@@ -117,80 +118,50 @@ const ManageCourse = () => {
               {department?.department_name}
             </Typography>
 
-            <div className="flex justify-center my-8">
-              <Stack spacing={2}>
-                <Pagination
-                  count={10}
-                  shape="rounded"
-                  sx={{
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected":
-                      {
-                        backgroundColor: "#ffae00",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected:hover":
-                      {
-                        backgroundColor: "#FF9500",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root:hover":
-                      {
-                        backgroundColor: "#FF9500",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-                  }}
-                />
-              </Stack>
-            </div>
             <List sx={{ my: 4 }}>
-              {classes?.display && classes?.map((item) => (
-                <Fragment key={item._id}>
-                  <ListItem className="flex items-center hover:bg-[#ddd] transition-all ease-in-out duration-150 cursor-pointer">
-                    <div className="flex items-center justify-between w-full">
-                      <div>
-                        <LoginIcon sx={{ color: "#555", mr: 2 }} />
-                        <Link
-                          to={`/${path.CLASSPAGE}/${item._id}`}
-                          className="w-[80%]"
-                        >
-                          <span className="mr-2">{item?.class_name}</span>
-                          <span>{item?.class_code}</span>
-                        </Link>
-                      </div>
-                      <div>
-                        <InfoOutlinedIcon
-                          sx={{ color: "#555", cursor: "pointer" }}
-                          onClick={() => handleInfoClick(item)}
-                        />
-                      </div>
-                    </div>
-                  </ListItem>
-                  <>
-                    {selectedClasses.includes(item) && (
-                      <div className="p-4">
-                        <Typography variant="body2" color="textSecondary">
-                          Teacher:
-                          <span className="text-[#1c57a5] ml-1">
-                            {item?.owner?.fullname}
-                          </span>
-                        </Typography>
-                        <div className="mt-4">
-                          <Link className="hover:bg-[#FF9500] border bg-primary p-2 text-white transition-all ease-in-out duration-200">
-                            Click to enter this course
+              {classes?.map((item) => {
+                return item?.display ? (
+                  <Fragment key={item._id}>
+                    <ListItem className="flex items-center hover:bg-[#ddd] transition-all ease-in-out duration-150 cursor-pointer">
+                      <div className="flex items-center justify-between w-full">
+                        <div>
+                          <LoginIcon sx={{ color: "#555", mr: 2 }} />
+                          <Link
+                            to={`/${path.CLASSPAGE}/${item._id}`}
+                            className="w-[80%]"
+                          >
+                            <span className="mr-2">{item?.class_name}</span>
+                            <span>{item?.class_code}</span>
                           </Link>
                         </div>
+                        <div>
+                          <InfoOutlinedIcon
+                            sx={{ color: "#555", cursor: "pointer" }}
+                            onClick={() => handleInfoClick(item)}
+                          />
+                        </div>
                       </div>
-                    )}
-                  </>
-                </Fragment>
-              ))}
+                    </ListItem>
+                    <>
+                      {selectedClasses.includes(item) && (
+                        <div className="p-4">
+                          <Typography variant="body2" color="textSecondary">
+                            Teacher:
+                            <span className="text-[#1c57a5] ml-1">
+                              {item?.owner?.fullname}
+                            </span>
+                          </Typography>
+                          <div className="mt-4">
+                            <Link className="hover:bg-[#FF9500] border bg-primary p-2 text-white transition-all ease-in-out duration-200">
+                              Click to enter this course
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  </Fragment>
+                ) : null;
+              })}
             </List>
           </div>
           <div className="w-[20%]">

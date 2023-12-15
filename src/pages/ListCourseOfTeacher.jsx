@@ -1,6 +1,6 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LoginIcon from "@mui/icons-material/Login";
-import { List, ListItem, Pagination, Stack, Typography } from "@mui/material";
+import { List, ListItem, Typography } from "@mui/material";
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -33,38 +33,7 @@ const ListCourseOfTeacher = () => {
               Danh sách lớp học
             </Typography>
 
-            <div className="flex justify-center my-8">
-              <Stack spacing={2}>
-                <Pagination
-                  count={10}
-                  shape="rounded"
-                  sx={{
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected":
-                      {
-                        backgroundColor: "#ffae00",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected:hover":
-                      {
-                        backgroundColor: "#FF9500",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root:hover":
-                      {
-                        backgroundColor: "#FF9500",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-                  }}
-                />
-              </Stack>
-            </div>
+            
             <List sx={{ my: 4 }}>
               {classes?.map((item) => (
                 <Fragment key={item._id}>

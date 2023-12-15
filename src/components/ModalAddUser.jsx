@@ -43,7 +43,6 @@ const ModalAddUser = ({ handleClose, open, classId }) => {
 
   const onSubmit = async (values) => {
     values.class_id = classId;
-
     try {
       const response = await apiAddStudentToClass(values);
       console.log("response: ", response);

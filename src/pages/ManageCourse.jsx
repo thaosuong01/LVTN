@@ -73,7 +73,7 @@ const ManageCourse = () => {
         allClasses.push(...classData);
       }
 
-      setDisplayStatus(allClasses?.map(item => item.display))
+      setDisplayStatus(allClasses?.map((item) => item.display));
 
       setClasses(allClasses);
 
@@ -102,7 +102,7 @@ const ManageCourse = () => {
       const response = await apiUpdateClass({ display: !dataDisplay }, classId); // Replace classId with the actual class identifier
       console.log("Class display status updated:", response);
       if (response.status === 201) {
-        fetchClasses()
+        fetchClasses();
       }
     } catch (error) {
       console.error("Error updating class display status:", error);
@@ -161,38 +161,6 @@ const ManageCourse = () => {
                 Tạo lớp học mới
               </Link>
             </div>
-            {/* <div className="flex justify-center my-8">
-              <Stack spacing={2}>
-                <Pagination
-                  count={10}
-                  shape="rounded"
-                  sx={{
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected":
-                      {
-                        backgroundColor: "#ffae00",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected:hover":
-                      {
-                        backgroundColor: "#FF9500",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-
-                    "& .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root:hover":
-                      {
-                        backgroundColor: "#FF9500",
-                        color: "#fff",
-                        transition: "ease-in-out ",
-                        transitionDuration: ".3s",
-                      },
-                  }}
-                />
-              </Stack>
-            </div> */}
             {classes.map((item, index) => (
               <List key={item?._id}>
                 <ListItem className="flex items-center">
@@ -237,7 +205,9 @@ const ManageCourse = () => {
                                 transition: "ease-in-out",
                                 transitionDuration: ".3s",
                               }}
-                              onClick={() => handleClick(item?._id,item?.display)}
+                              onClick={() =>
+                                handleClick(item?._id, item?.display)
+                              }
                             />
                           ) : (
                             <VisibilityOffIcon

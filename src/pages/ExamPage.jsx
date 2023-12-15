@@ -264,6 +264,7 @@ function shuffle(array) {
 
 const ExamPage = () => {
   const [quizData, setQuizData] = useState(null);
+  console.log('quizData: ', quizData);
   const [quizResult, setQuizResult] = useState();
   console.log("quizResult: ", quizResult);
 

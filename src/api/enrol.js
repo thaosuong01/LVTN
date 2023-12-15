@@ -68,3 +68,15 @@ export const apiAddStudentToClass = async (data) => {
     console.log(error);
   }
 };
+
+export const apiAddManyStudentToClass = async (data) => {
+  try {
+    return instance({
+      method: "POST",
+      url: `/api/enrol/add-many-student-to-class`,
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

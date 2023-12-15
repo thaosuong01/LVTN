@@ -1,18 +1,40 @@
 import { Clear } from "@mui/icons-material";
-import { Box, Breadcrumbs, Button, Container, Typography } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Container,
+  Typography,
+  styled,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { apiGetClassById } from "../api/class";
+import { apiGetCourseByID } from "../api/course";
 import {
+  apiAddManyStudentToClass,
   apiDeleteStudentEnroled,
   apiGetUserEnroledByClass,
 } from "../api/enrol";
-import RightNavigate from "../components/RightNavigate";
-import { apiGetCourseByID } from "../api/course";
-import { path } from "../utils/path";
 import ModalAddUser from "../components/ModalAddUser";
+import RightNavigate from "../components/RightNavigate";
+import { path } from "../utils/path";
+import Papa from "papaparse";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const UserEnroled = () => {
   const actionButton = (params) => (
@@ -53,15 +75,15 @@ const UserEnroled = () => {
 
   const { cid } = useParams();
 
+  const [fileKey, setFileKey] = useState(0);
   const [classes, setClasses] = useState([]);
-  console.log("classes: ", classes);
 
+  // Get class
   useEffect(() => {
     async function getClass() {
       const response = await apiGetClassById(cid);
       setClasses(response?.data);
     }
-
     getClass();
   }, [cid]);
 
@@ -126,6 +148,61 @@ const UserEnroled = () => {
     fetchUserEnroledById();
   };
 
+  const HandleImportCSV = (e) => {
+    if (e.target && e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      //Check type file
+      if (file.type !== "text/csv") {
+        Swal.fire({ text: "Chỉ chấp nhận file csv!" });
+        return;
+      }
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true, // Bỏ qua các dòng trống
+        encoding: "UTF-8",
+        complete: async function (result) {
+          setFileKey(fileKey + 1);
+          let rawCSV = result.data;
+          if (rawCSV.length > 0) {
+            const usernameInserts = [];
+
+            const userEnrolled = userEnrol?.map(
+              (t) => t?.user_id?.account_id?.username
+            );
+
+            rawCSV.forEach((raw) => {
+              console.log(`raw`, raw);
+              if (!userEnrolled.includes(raw?.username)) {
+                usernameInserts.push(raw.username);
+              }
+            });
+
+            try {
+              const response = await apiAddManyStudentToClass({
+                class_id: cid,
+                usernameInserts,
+              });
+              if (response) {
+                Swal.fire({ text: "Thêm thành công" }).then(() => {
+                  fetchUserEnroledById();
+                });
+              }
+            } catch (error) {
+              console.log("error: ", error);
+              Swal.fire({
+                text: error?.response?.data?.message || "Đã có lỗi xãy ra!",
+              });
+            }
+          } else {
+            Swal.fire({ text: "Không tìm thấy dữ liệu trong file csv" });
+          }
+        },
+      });
+    }
+  };
+
   return (
     <>
       <div className="bg-white py-8">
@@ -164,16 +241,30 @@ const UserEnroled = () => {
                     Sỉ số: {userEnrol?.length}
                   </Typography>
                 </div>
-                <Button
-                  onClick={() => handleOpenModal()}
-                  sx={{
-                    backgroundColor: "#90c446",
-                    "&:hover": { backgroundColor: "#5b9608" },
-                    color: "white",
-                  }}
-                >
-                  Thêm sinh viên
-                </Button>
+                <div className="space-x-2">
+                  <Button
+                    component="label"
+                    variant="contained"
+                    startIcon={<CloudUploadIcon />}
+                  >
+                    Import
+                    <VisuallyHiddenInput
+                      key={fileKey}
+                      onChange={(e) => HandleImportCSV(e)}
+                      type="file"
+                    />
+                  </Button>
+                  <Button
+                    onClick={() => handleOpenModal()}
+                    sx={{
+                      backgroundColor: "#90c446",
+                      "&:hover": { backgroundColor: "#5b9608" },
+                      color: "white",
+                    }}
+                  >
+                    Thêm sinh viên
+                  </Button>
+                </div>
               </Box>
             </div>
             <Container maxWidth={"lg"}>

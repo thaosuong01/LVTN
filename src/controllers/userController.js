@@ -14,7 +14,7 @@ export const getAllUserController = async (req, res, next) => {
         path: "role_id",
         select: "role_name description",
       })
-      .select("fullname avatar email birthday");
+      .select("fullname avatar email createdAt");
 
     const excludeAdmin = getAll.filter(
       (item) => item.role_id?.role_name !== "Admin"

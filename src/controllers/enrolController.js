@@ -80,6 +80,58 @@ export const addStudentToClass = async (req, res, next) => {
   }
 };
 
+export const addManyStudentToClass = async (req, res, next) => {
+  try {
+    console.log("req.body: ", req.body);
+    const { class_id, usernameInserts } = req.body;
+
+    if (!class_id) throw new ApiError(400, "Missing inputs");
+    if (usernameInserts?.length === 0)
+      return res.status(200).json("Tạo thành công");
+
+    let data = await Promise.all(
+      usernameInserts.map(
+        (item) =>
+          new Promise(async (resolve, reject) => {
+            try {
+              //Tìm account từ username
+              const account = await Account.findOne({ username: item });
+
+              if (!account) {
+                throw new ApiError(404, `Không tìm thấy sinh viên ${item}`);
+              }
+
+              // Tìm user dựa trên account_id
+              const user = await User.findOne({ account_id: account._id });
+
+              if (!user) {
+                throw new ApiError(404, "User not found");
+              }
+
+              //push data
+              resolve({
+                user_id: user._id,
+                class_id,
+              });
+            } catch (error) {
+              reject(error);
+            }
+          })
+      )
+    );
+
+    console.log("data: ", data);
+
+    const rs = Enrol.insertMany(data);
+    if (!rs) throw new ApiError(400, "fail to insert data");
+
+    console.log("rs: ", rs);
+    return res.status(200).json(rs);
+  } catch (error) {
+    next(new ApiError(500, error.message));
+  }
+};
+
 // Lấy ra danh sách sinh viên đã enrol vào lớp học nào đó
 export const getEnrolledStudents = async (req, res, next) => {
   try {

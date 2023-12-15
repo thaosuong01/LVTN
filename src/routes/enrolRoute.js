@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addManyStudentToClass,
   addStudentToClass,
   checkEnrol,
   enrolmentController,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post("/create", [isAuthentication], enrolmentController);
 router.post("/add-student-to-class", addStudentToClass);
+router.post("/add-many-student-to-class", addManyStudentToClass);
 router.get(
   "/get-class-enrol-of-student",
   [isAuthentication],

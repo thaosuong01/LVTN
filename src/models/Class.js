@@ -27,6 +27,9 @@ const classSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "courses",
     },
+    delete: {
+      type: Boolean,
+    },
   },
   { timestamps: true, versionKey: false }
 );

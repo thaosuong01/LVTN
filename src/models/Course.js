@@ -17,6 +17,9 @@ const courseSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "departments",
     },
+    delete: {
+      type: Boolean,
+    },
   },
   { timestamps: true, versionKey: false }
 );

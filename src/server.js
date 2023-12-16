@@ -14,6 +14,7 @@ import departmentRoute from "./routes/departmentRoute.js";
 import enrolRoute from "./routes/enrolRoute.js";
 import exerciseRoute from "./routes/exerciseRoute.js";
 import examSetRoute from "./routes/examSetRoute.js";
+import examResultRoute from "./routes/examResultRoute.js";
 import exerciseSubmitRoute from "./routes/exerciseSubmitRoute.js";
 import roleRoute from "./routes/roleRoute.js";
 import topicRoute from "./routes/topicRoute.js";
@@ -57,6 +58,7 @@ app.use("/api/lecture", lectureRoute);
 app.use("/api/exercise", exerciseRoute);
 app.use("/api/exercise-submit", exerciseSubmitRoute);
 app.use("/api/exam-set", examSetRoute);
+app.use("/api/exam-result", examResultRoute);
 
 app.use((req, res, next) => {
   return next(new ApiError(404, "Not found"));

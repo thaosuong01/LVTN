@@ -39,8 +39,40 @@ export const createExamSet = async (req, res, next) => {
 export const updateExamSet = async (req, res, next) => {
   try {
     console.log("req.body: ", req.body);
-    return;
-  } catch (error) {}
+    const { exam_id } = req.params;
+    console.log("exam_id: ", exam_id);
+    const { set_name, desc, attempt_count, questions } = req.body;
+
+    const updatedExamSet = await ExamSet.findByIdAndUpdate(
+      exam_id,
+      {
+        set_name,
+        desc,
+        attempt_count,
+      },
+      { new: true }
+    );
+    if (!updatedExamSet) throw new ApiError(400, "Fail to update exam");
+
+    const deletedQuestions = await Question.deleteMany({
+      exam_set_id: exam_id,
+    });
+    console.log("deletedQuestions: ", deletedQuestions);
+
+    const updatedQuestions = questions.map((question) => ({
+      ...question,
+      exam_set_id: exam_id,
+    }));
+    console.log("updatedQuestions: ", updatedQuestions);
+
+    const questionsCreated = await Question.insertMany(updatedQuestions);
+    console.log("questionsCreated: ", questionsCreated);
+
+    return res.status(200).json(updatedExamSet);
+  } catch (error) {
+    console.log("error: ", error);
+    next(new ApiError(500, error.message));
+  }
 };
 
 export const getExamSetById = async (req, res, next) => {
@@ -63,7 +95,7 @@ export const getExamSetById = async (req, res, next) => {
 
     examSets = {
       ...examSets,
-      quizTitle : examSets.set_name,
+      quizTitle: examSets.set_name,
       quizSynopsis: examSets.desc,
       questions,
     };
@@ -101,5 +133,25 @@ export const getExamSetByClassId = async (req, res, next) => {
   } catch (error) {
     next(new ApiError(500, error.message));
     console.log("error: ", error);
+  }
+};
+
+
+export const deleteExamSet = async (req, res, next) => {
+  try {
+    const { exam_id } = req.params;
+
+    const deletedExamSet = await ExamSet.findByIdAndDelete(exam_id);
+    if (!deletedExamSet) throw new ApiError(400, "Exam set not found!");
+    console.log("deletedExamSet: ", deletedExamSet);
+
+    const deletedQuestion = await Question.deleteMany({ exam_set_id: exam_id });
+    if (!deletedQuestion) throw new ApiError(400, "Fail to delete question");
+    console.log("deletedQuestion: ", deletedQuestion);
+
+    return res.status(200).json(deletedExamSet);
+  } catch (error) {
+    console.log("error: ", error);
+    next(new ApiError(500, error.message));
   }
 };

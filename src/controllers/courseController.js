@@ -15,6 +15,7 @@ export const createCourseController = async (req, res, next) => {
       course_code,
       course_name,
       department_id,
+      delete: false,
     });
 
     return res.status(201).json(course);
@@ -114,6 +115,25 @@ export const getCourseByDepartmentController = async (req, res, next) => {
       .populate("department_id", "department_name");
 
     res.status(200).json(courses);
+  } catch (error) {
+    console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const removeCourseController = async (req, res, next) => {
+  try {
+    const course_id = req.params.id;
+
+    const deleteCourse = await Course.findByIdAndUpdate(course_id, {
+      delete: true,
+    }); // Sử dụng findByIdAndUpdate để cập nhật trạng thái xóa mềm
+
+    if (!deleteCourse) {
+      return next(new ApiError(404, "Course Not Found"));
+    }
+
+    return res.status(201).send("Course deleted successfully");
   } catch (error) {
     console.log(error);
     next(new ApiError(500, error.message));

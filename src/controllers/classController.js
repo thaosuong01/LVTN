@@ -31,6 +31,7 @@ export const createClassController = async (req, res, next) => {
       owner: user_id,
       course_id,
       display,
+      delete: false,
     });
 
     const classes = await createClass.populate("course_id");
@@ -85,7 +86,7 @@ export const updateClassController = async (req, res, next) => {
       await req.body;
 
     const salt = await bcrypt.genSalt();
-    const passwordHash = class_pass && await bcrypt.hash(class_pass, salt);
+    const passwordHash = class_pass && (await bcrypt.hash(class_pass, salt));
 
     const update = await Class.findByIdAndUpdate(
       class_id,
@@ -106,6 +107,25 @@ export const updateClassController = async (req, res, next) => {
     }
 
     return res.status(201).json(update);
+  } catch (error) {
+    console.log(error);
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const removeClassController = async (req, res, next) => {
+  try {
+    const class_id = req.params.id; // Sử dụng req.params.id thay vì await req.params.id
+
+    const deleteClass = await Class.findByIdAndUpdate(class_id, {
+      delete: true,
+    }); // Sử dụng findByIdAndUpdate để cập nhật trạng thái xóa mềm
+
+    if (!deleteClass) {
+      return next(new ApiError(404, "Class Not Found"));
+    }
+
+    return res.status(201).send("Class deleted successfully");
   } catch (error) {
     console.log(error);
     next(new ApiError(500, error.message));
@@ -148,7 +168,10 @@ export const getClassCreatedByOwner = async (req, res, next) => {
   try {
     const { user_id } = await req.account;
 
-    const classes = await Class.find({ owner: user_id }).populate("course_id", "course_code course_name");
+    const classes = await Class.find({ owner: user_id }).populate(
+      "course_id",
+      "course_code course_name"
+    );
     return res.status(200).json(classes);
   } catch (error) {
     console.log(error);

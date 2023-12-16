@@ -18,6 +18,7 @@ export const createDepartmentController = async (req, res, next) => {
 
     const newDepartment = await Department.create({
       department_name: department_name,
+      delete: false,
     });
 
     return res.status(201).json(newDepartment);
@@ -39,6 +40,7 @@ export const getAllDepartmentController = async (req, res, next) => {
 export const getDepartmentsWithCourses = async (req, res, next) => {
   try {
     const departments = await Department.find();
+    console.log("departments: ", departments);
 
     // Tạo một mảng chứa thông tin các khoa và khóa học
     const departmentsWithCourses = [];
@@ -52,6 +54,7 @@ export const getDepartmentsWithCourses = async (req, res, next) => {
       departmentsWithCourses.push({
         department: department.department_name,
         department_id: department._id,
+        delete: department.delete,
         courses: courses.map((course) => ({
           id: course._id,
           name: course.course_name,
@@ -122,6 +125,27 @@ export const deleteDepartmentController = async (req, res, next) => {
     }
 
     return res.status(204).json({ message: "Department deleted successfully" });
+  } catch (error) {
+    next(new ApiError(500, error.message));
+  }
+};
+
+export const removeDepartmentController = async (req, res, next) => {
+  try {
+    const department_id = req.params.id;
+    const updatedDepartment = await Department.findByIdAndUpdate(
+      department_id,
+      { delete: true }, // Assuming 'deleted' property to indicate soft deletion
+      { new: true }
+    );
+
+    if (!updatedDepartment) {
+      return next(new ApiError(404, "Department not found"));
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Department soft-deleted successfully" });
   } catch (error) {
     next(new ApiError(500, error.message));
   }

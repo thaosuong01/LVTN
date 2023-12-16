@@ -9,6 +9,9 @@ const departmentSchema = new Schema(
       required: true,
       unique: true,
     },
+    delete: {
+      type: Boolean,
+    },
   },
   { timestamps: true, versionKey: false }
 );

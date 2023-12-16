@@ -28,6 +28,10 @@ const examResult = new Schema(
       type: Schema.Types.ObjectId,
       ref: "examSets",
     },
+    attempt_count: {
+      type: Number,
+      default: 1,
+    },
   },
   { timestamps: true, versionKey: false }
 );

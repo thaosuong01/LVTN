@@ -6,6 +6,7 @@ import {
   getClassByIdController,
   getClassCreatedByOwner,
   getClassInCourseController,
+  removeClassController,
   updateClassController,
 } from "../controllers/classController.js";
 import { isAuthentication, isTeacher } from "../middlewares/auth-middleware.js";
@@ -16,6 +17,7 @@ router.post("/create", [isAuthentication], createClassController);
 router.get("/", getAllClassController);
 router.get("/get-class/:id", getClassByIdController);
 router.put("/update-class/:id", updateClassController);
+router.put("/remove-class/:id", removeClassController);
 router.delete("/delete-class/:id", deleteClassController);
 router.get("/get-class-in-course/:cid", getClassInCourseController);
 router.get(

@@ -72,12 +72,14 @@ const ManageCourse = () => {
         const classData = response?.data;
         allClasses.push(...classData);
       }
-
+      
       setDisplayStatus(allClasses?.map((item) => item.display));
+      
+      const activeClasses = allClasses.filter((item) => !item.delete);
 
-      setClasses(allClasses);
+      setClasses(activeClasses);
 
-      return allClasses;
+      return activeClasses;
     } catch (error) {
       console.log(error);
     }

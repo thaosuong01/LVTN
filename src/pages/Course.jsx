@@ -35,7 +35,11 @@ const Course = () => {
   useEffect(() => {
     async function getClass() {
       const response = await apiGetClass(cid);
-      setClasses(response?.data?.filter(item => item.display));
+      const allClasses = await response?.data?.filter((item) => item.display);
+
+      const activeClasses = allClasses.filter((item) => !item.delete);
+
+      setClasses(activeClasses);
     }
 
     getClass();

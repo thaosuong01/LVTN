@@ -24,7 +24,12 @@ import ModalEditDocument from "./ModalEditDocument";
 import ModalEditTopic from "./ModalEditTopic";
 import { apiDeleteLecture, apiGetLectureByClassId } from "../api/lecture";
 import ModalEditLecture from "./ModalEditLecture";
-import { apiGetAllExamSet, apiGetExamSetByClassId } from "../api/examSet";
+import {
+  apiDeleteExam,
+  apiGetAllExamSet,
+  apiGetExamSetByClassId,
+} from "../api/examSet";
+import ModalEditExam from "./ModalEditExam";
 
 const ListDocument = () => {
   const { isEditMode: editMode } = useSelector((state) => state.course);
@@ -71,6 +76,7 @@ const ListDocument = () => {
     setOpenModalAdd(false);
     getDocumentsByClassId(cid);
     getLectureByClassId(cid);
+    getExamSetByClassId(cid);
   };
 
   const [docId, setDocId] = useState("");
@@ -87,7 +93,7 @@ const ListDocument = () => {
   };
 
   const [openModalEditLecture, setOpenModalEditLecture] = useState(false);
-  const [lectureId, setLectureId] = useState([]);
+  const [lectureId, setLectureId] = useState(null);
 
   const handleOpenModalEditLecture = (lectureId) => {
     setOpenModalEditLecture(true);
@@ -97,6 +103,19 @@ const ListDocument = () => {
   const handleCloseModalEditLecture = () => {
     setOpenModalEditLecture(false);
     getLectureByClassId(cid);
+  };
+
+  const [openModalEditExam, setOpenModalEditExam] = useState(false);
+  const [dataExam, setDataExam] = useState(null);
+
+  const handleOpenModalEditExam = (exam) => {
+    setOpenModalEditExam(true);
+    setDataExam(exam);
+  };
+
+  const handleCloseModalEditExam = () => {
+    setOpenModalEditExam(false);
+    getExamSetByClassId(cid);
   };
 
   const { user } = useSelector((state) => state.user);
@@ -253,6 +272,28 @@ const ListDocument = () => {
     });
   };
 
+  const handleDeleteExam = (exam_id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffae00",
+      cancelButtonColor: "#90c446",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await apiDeleteExam(exam_id);
+          console.log(response);
+          Swal.fire("Deleted!", "The exam set has been deleted.", "success");
+          getExamSetByClassId(cid);
+        } catch (error) {
+          Swal.fire("Fail!", "Delete fail", "error");
+        }
+      }
+    });
+  };
   const handleDeleteLecture = (lid) => {
     Swal.fire({
       title: "Are you sure?",
@@ -515,9 +556,17 @@ const ListDocument = () => {
                               alt="Folder"
                               width={40}
                             />
-                            <Link to={`/${path.EXAM}/${exam?._id}`}>
-                              {exam?.set_name}
-                            </Link>
+                            {user?._id === classes?.owner ? (
+                              <Link
+                                to={`/${path.RESULTS_STATISTICS}/${exam?._id}`}
+                              >
+                                {exam?.set_name}
+                              </Link>
+                            ) : (
+                              <Link to={`/${path.EXAM}/${exam?._id}`}>
+                                {exam?.set_name}
+                              </Link>
+                            )}
                           </div>
                         </div>
 
@@ -525,15 +574,15 @@ const ListDocument = () => {
                           <Checkbox />
                           {editMode ? (
                             <div className="flex gap-2">
-                              <Link
-                                to={`/${path.UPDATEPRACTICE}?class_id=${classes?._id}&eid=${exam?._id}`}
+                              <span
                                 className="text-sm text-primary hover:text-hover"
+                                onClick={() => handleOpenModalEditExam(exam)}
                               >
                                 Chỉnh sửa
-                              </Link>
+                              </span>
                               <span
                                 className="text-primary text-sm hover:text-hover"
-                                onClick={() => handleDeleteExercise(exam._id)}
+                                onClick={() => handleDeleteExam(exam._id)}
                               >
                                 Xóa
                               </span>
@@ -588,6 +637,15 @@ const ListDocument = () => {
           handleClose={handleCloseModalEditLecture}
           lectureId={lectureId}
           open={openModalEditLecture}
+        />
+      )}
+      {openModalEditExam && (
+        <ModalEditExam
+          handleClose={handleCloseModalEditExam}
+          classId={classId}
+          topicId={topicId}
+          dataExam={dataExam}
+          open={openModalEditExam}
         />
       )}
     </>

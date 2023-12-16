@@ -27,7 +27,9 @@ const SearchResult = () => {
       const classes = course_id && (await apiGetClass(course_id));
       if (classes?.length === 0) return;
 
-      setListClasses(classes.data);
+      const activeClasses = classes?.data.filter((item) => !item.delete);
+
+      setListClasses(activeClasses);
 
       //Lấy id course để get ra danh sách lớp học
     } catch (error) {

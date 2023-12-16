@@ -11,6 +11,9 @@ const ListCategory = () => {
   const [openIndexes, setOpenIndexes] = useState([]);
   const { departments } = useSelector((state) => state.department);
 
+
+  const activeDepartments = departments?.filter((item) => !item.delete);
+
   const handleClick = (index) => {
     if (openIndexes.includes(index)) {
       setOpenIndexes(openIndexes.filter((i) => i !== index));
@@ -22,7 +25,7 @@ const ListCategory = () => {
   return (
     <>
       <List>
-        {departments?.map((item, index) => (
+        {activeDepartments?.map((item, index) => (
           <Fragment key={index}>
             <ListItemButton
               component={item?.courses.length === 0 ? "div" : Link}

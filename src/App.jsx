@@ -21,6 +21,8 @@ import ListCourseOfTeacher from "./pages/ListCourseOfTeacher";
 import EnrolmentPage from "./pages/EnrolmentPage";
 import ListMyCourse from "./pages/ListMyCourse";
 import ExamPage from "./pages/ExamPage";
+import ResultsStatistics from "./pages/ResultsStatistics";
+// import ResultsStatistics from "./pages/ResultsStatistics";
 
 function App() {
   return (
@@ -57,6 +59,10 @@ function App() {
             element={<ManageCourse />}
           />
           <Route path={`${path.EXAM}/:exam_id`} element={<ExamPage />} />
+          <Route
+            path={`${path.RESULTS_STATISTICS}/:exam_id`}
+            element={<ResultsStatistics />}
+          />
         </Route>
         <Route path={path.NOTFOUND} element={<NotFoundPage />} />
       </Routes>

@@ -10,10 +10,16 @@ const ListMyCourse = () => {
   const { user } = useSelector((state) => state.user);
 
   const [listClass, setListClass] = useState([]);
+  console.log("listClass: ", listClass);
 
   const getClassEnrolOfStudent = async () => {
     const response = await apiGetClassEnrolOfStudent(user?._id);
-    setListClass(response?.data);
+
+    const activeClasses = response?.data?.filter((enrolledClass) => {
+      return !enrolledClass.class_id.delete; // Assuming 'delete' property indicates soft deletion
+    });
+
+    setListClass(activeClasses);
   };
 
   useEffect(() => {

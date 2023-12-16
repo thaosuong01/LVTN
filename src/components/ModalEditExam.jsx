@@ -15,7 +15,7 @@ import Papa from "papaparse";
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
-import { apiCreateExamSet } from "../api/examSet";
+import { apiCreateExamSet, apiUpdateExamSet } from "../api/examSet";
 
 const style = {
   position: "absolute",
@@ -43,14 +43,17 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
+const ModalEditExam = ({ handleClose, open, onClose, dataExam }) => {
   const [fileKey, setFileKey] = useState(0);
   const [dataCsv, setDataCsv] = useState([]);
+  const [filename, setFilename] = useState(null);
+  console.log("filename: ", filename);
   console.log("dataCsv: ", dataCsv);
 
   const HandleImportCSV = (e) => {
     if (e.target && e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      setFilename(file.name);
 
       //Check type file
       if (file.type !== "text/csv") {
@@ -67,7 +70,6 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
           setFileKey(fileKey + 1);
           let rawCSV = result.data;
           if (rawCSV.length > 0) {
-           
             console.log("Kiểm tra file");
             const transformedData = rawCSV.map((item) => {
               return {
@@ -87,19 +89,15 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
   const onSubmit = async (values) => {
     try {
       values.questions = dataCsv;
-      values.class_id = classId;
-      values.topic_id = topicId;
       console.log("values: ", values);
-      // return;
-      const response = await apiCreateExamSet(values);
-      if (response.status === 201) {
+      const response = await apiUpdateExamSet(dataExam?._id, values);
+      console.log("response: ", response);
+      if (response.status === 200) {
         Swal.fire({
-          text: "Tải lên thành công!",
+          text: "Cập nhật thành công!",
           confirmButtonColor: "#ffae00",
         });
-
         handleClose();
-        onClose();
       }
     } catch (error) {
       Swal.fire({
@@ -111,10 +109,10 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
   };
 
   const initialValues = {
-    set_name: "",
-    desc: "",
-    attempt_count: 1,
-    isNotify: false,
+    set_name: dataExam?.set_name || "",
+    desc: dataExam?.desc || "",
+    attempt_count: dataExam?.attempt_count || 1,
+    isNotify: dataExam?.isNotify || false,
   };
 
   const validationSchema = Yup.object().shape({
@@ -147,7 +145,7 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
               </IconButton>
 
               <div className="my-8 flex justify-center">
-                <h1 className="text-2xl font-bold">Thêm mini test</h1>
+                <h1 className="text-2xl font-bold">Cập nhật mini test</h1>
               </div>
               <div>
                 <Formik
@@ -226,7 +224,7 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
                         </div>
                         <div className="flex justify-center items-center my-2">
                           <InputLabel className="w-[30%]">File csv</InputLabel>
-                          <div className="w-[70%]">
+                          <div className="w-[70%] space-x-2">
                             <Button
                               component="label"
                               variant="contained"
@@ -239,6 +237,7 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
                                 type="file"
                               />
                             </Button>
+                            <span>{filename || ""}</span>
                           </div>
                         </div>
                         
@@ -252,7 +251,7 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
                               color: "white",
                             }}
                           >
-                            Thêm mini test
+                            Cập nhật mini test
                           </Button>
                         </div>
                       </form>
@@ -268,4 +267,4 @@ const ExamSet = ({ handleClose, topicId, classId, open, onClose }) => {
   );
 };
 
-export default ExamSet;
+export default ModalEditExam;

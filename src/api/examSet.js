@@ -12,6 +12,29 @@ export const apiCreateExamSet = async (data) => {
   }
 };
 
+export const apiUpdateExamSet = async (id,data) => {
+  try {
+    return instance({
+      method: "PUT",
+      url: `/api/exam-set/update/${id}`,
+      data
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const apiDeleteExam = async (id) => {
+  try {
+    return instance({
+      method: "DELETE",
+      url: `/api/exam-set/delete/${id}`,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const apiGetAllExamSet = async () => {
   try {
     return instance({

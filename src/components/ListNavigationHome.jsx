@@ -8,7 +8,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { path } from "../utils/path.js";
 import { useSelector } from "react-redux";
-import { number } from "yup";
 
 const NavigationItem = ({ label, pathData, children = [] }) => {
   const [open, setOpen] = useState(false);

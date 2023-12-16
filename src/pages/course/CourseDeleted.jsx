@@ -1,36 +1,38 @@
-import { AddCircleOutlined, Delete, EditOutlined } from '@mui/icons-material';
+import { Clear } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiGetListDepartment, apiRemoveDepartment } from 'apis/department';
+import { apiDeleteCourse, apiGetListCourse } from 'apis/course';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const Department = () => {
+const CourseDeleted = () => {
   const actionButton = (params) => (
     <div className="flex gap-4">
-      <Button
-        LinkComponent={Link}
-        to={`${Path.DepartmentEdit}/${params.row._id}`}
-        variant="contained"
-        className="bg-primary hover:bg-hover"
-      >
-        <EditOutlined />
-      </Button>
       <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
-        <Delete />
+        <Clear />
       </Button>
     </div>
   );
 
   const columns = [
     {
-      field: 'department_name',
-      headerName: 'Department Name',
-      width: 900
+      field: 'course_code',
+      headerName: 'Course Code',
+      width: 240
     },
-
+    {
+      field: 'course_name',
+      headerName: 'Course Name',
+      width: 300
+    },
+    {
+      field: 'department_id',
+      headerName: 'Department',
+      width: 340,
+      valueGetter: (params) => params.row.department_id?.department_name
+    },
     {
       field: 'action',
       headerName: '',
@@ -53,60 +55,54 @@ const Department = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await apiRemoveDepartment(id);
+          await apiDeleteCourse(id);
 
           Swal.fire('Deleted!', 'The course has been deleted.', 'success');
-          fetchDepartment();
+          fetchCourse();
         } catch (error) {
           Swal.fire('Fail!', 'Delete fail', 'error');
         }
       }
     });
   };
-  const [departments, setDepartment] = useState([]);
-  console.log('departments: ', departments);
+  const [courses, setCourse] = useState([]);
+  console.log('courses: ', courses);
 
-  document.title = 'Khoa';
+  document.title = 'Khóa học';
 
-  const fetchDepartment = async () => {
+  const fetchCourse = async () => {
     try {
-      const response = await apiGetListDepartment();
-      const filteredDepart = response?.data?.filter((depart) => !depart.delete);
-      setDepartment(filteredDepart);
+      const response = await apiGetListCourse();
+      const filteredCourses = response.data.filter((cl) => cl.delete);
+      setCourse(filteredCourses);
     } catch (error) {
-      console.log('Failed to fetch department list: ', error);
+      console.log('Failed to fetch user list: ', error);
     }
   };
   useEffect(() => {
-    fetchDepartment();
+    fetchCourse();
   }, []);
 
   return (
     <Container maxWidth={'lg'}>
       <Box display={'flex'} justifyContent={'space-between'} marginBottom={2}>
         <Typography variant="h2" color="initial">
-          Danh sách khoa
+          Danh sách khóa học
         </Typography>
 
-        <div className="flex gap-2">
-          <Button LinkComponent={Link} to={Path.DepartmentDeleted} variant="contained" className="bg-primary hover:bg-hover">
-            <Delete />
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddCircleOutlined />}
-            LinkComponent={Link}
-            to={Path.DepartmentAdd}
-            className="bg-primary hover:bg-hover"
-          >
-            Thêm khoa
-          </Button>
-        </div>
+        <Button
+          variant="contained"
+          LinkComponent={Link}
+          to={Path.Course}
+          className="bg-primary hover:bg-hover"
+        >
+          Danh sách khóa học
+        </Button>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid
           checkboxSelection
-          rows={departments}
+          rows={courses}
           columns={columns}
           initialState={{
             pagination: {
@@ -121,7 +117,7 @@ const Department = () => {
               showQuickFilter: true
             }
           }}
-          getRowId={(departments) => departments._id}
+          getRowId={(courses) => courses._id}
           pageSizeOptions={[5]}
           sx={{
             '& div div div div div .MuiDataGrid-withBorderColor': {
@@ -147,4 +143,4 @@ const Department = () => {
   );
 };
 
-export default Department;
+export default CourseDeleted;

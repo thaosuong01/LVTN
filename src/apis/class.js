@@ -11,6 +11,17 @@ export const apiGetListClass = async () => {
   }
 };
 
+export const apiRemoveClass = async (id) => {
+  try {
+    return instance({
+      method: 'PUT',
+      url: `/api/class/remove-class/${id}`
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const apiDeleteClass = async (id) => {
   try {
     return instance({

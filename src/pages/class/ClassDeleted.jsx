@@ -1,42 +1,62 @@
-import { AddCircleOutlined, Delete, EditOutlined } from '@mui/icons-material';
+import { Clear } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiGetListDepartment, apiRemoveDepartment } from 'apis/department';
+import { apiGetListClass } from 'apis/class';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const Department = () => {
+
+const ClassDeleted = () => {
   const actionButton = (params) => (
-    <div className="flex gap-4">
-      <Button
-        LinkComponent={Link}
-        to={`${Path.DepartmentEdit}/${params.row._id}`}
-        variant="contained"
-        className="bg-primary hover:bg-hover"
-      >
-        <EditOutlined />
-      </Button>
-      <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
-        <Delete />
-      </Button>
-    </div>
+    <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
+      <Clear />
+    </Button>
   );
 
   const columns = [
+    // {
+    //   field: 'class_code',
+    //   headerName: 'Class Code',
+    //   width: 120
+    // },
     {
-      field: 'department_name',
-      headerName: 'Department Name',
-      width: 900
+      field: 'class_name',
+      headerName: 'Class Name',
+      width: 300,
+      valueGetter: (params) => {
+        return `${params?.row?.class_name} ${params?.row?.class_code}`;
+      }
     },
+    {
+      field: 'display',
+      headerName: 'Display',
+      width: 140,
+      valueGetter: (params) => {
+        const isDisplay = params.row.display;
 
+        return isDisplay ? 'Mở' : 'Đóng';
+      }
+    },
+    {
+      field: 'owner',
+      headerName: 'Owner',
+      width: 220,
+      valueGetter: (params) => params.row.owner?.fullname
+    },
+    {
+      field: 'course_id',
+      headerName: 'Course',
+      width: 240,
+      valueGetter: (params) => params.row.course_id?.course_name
+    },
     {
       field: 'action',
       headerName: '',
       sortable: false,
       filterable: false,
-      width: 180,
+      width: 100,
       renderCell: actionButton
     }
   ];
@@ -53,60 +73,57 @@ const Department = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await apiRemoveDepartment(id);
+          await apiDeleteClass(id);
 
-          Swal.fire('Deleted!', 'The course has been deleted.', 'success');
-          fetchDepartment();
+          Swal.fire('Deleted!', 'The class has been removed.', 'success');
+          fetchClass();
         } catch (error) {
           Swal.fire('Fail!', 'Delete fail', 'error');
         }
       }
     });
   };
-  const [departments, setDepartment] = useState([]);
-  console.log('departments: ', departments);
+  const [classes, setClasses] = useState([]);
+  console.log('classes: ', classes);
 
-  document.title = 'Khoa';
+  document.title = 'Lớp học';
 
-  const fetchDepartment = async () => {
+  const fetchClass = async () => {
     try {
-      const response = await apiGetListDepartment();
-      const filteredDepart = response?.data?.filter((depart) => !depart.delete);
-      setDepartment(filteredDepart);
+      const response = await apiGetListClass();
+      const filteredClasses = response.data.filter((cl) => cl.delete);
+      setClasses(filteredClasses);
+      // setClasses(response?.data);
     } catch (error) {
-      console.log('Failed to fetch department list: ', error);
+      console.log('Failed to fetch class list: ', error);
     }
   };
   useEffect(() => {
-    fetchDepartment();
+    fetchClass();
   }, []);
 
   return (
     <Container maxWidth={'lg'}>
       <Box display={'flex'} justifyContent={'space-between'} marginBottom={2}>
         <Typography variant="h2" color="initial">
-          Danh sách khoa
+          Danh sách lớp học
         </Typography>
 
         <div className="flex gap-2">
-          <Button LinkComponent={Link} to={Path.DepartmentDeleted} variant="contained" className="bg-primary hover:bg-hover">
-            <Delete />
-          </Button>
           <Button
             variant="contained"
-            startIcon={<AddCircleOutlined />}
             LinkComponent={Link}
-            to={Path.DepartmentAdd}
+            to={Path.Class}
             className="bg-primary hover:bg-hover"
           >
-            Thêm khoa
+            Danh sách lớp học
           </Button>
         </div>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid
           checkboxSelection
-          rows={departments}
+          rows={classes}
           columns={columns}
           initialState={{
             pagination: {
@@ -121,7 +138,7 @@ const Department = () => {
               showQuickFilter: true
             }
           }}
-          getRowId={(departments) => departments._id}
+          getRowId={(classes) => classes._id}
           pageSizeOptions={[5]}
           sx={{
             '& div div div div div .MuiDataGrid-withBorderColor': {
@@ -147,4 +164,4 @@ const Department = () => {
   );
 };
 
-export default Department;
+export default ClassDeleted;

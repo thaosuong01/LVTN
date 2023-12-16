@@ -1,7 +1,8 @@
-import { AddCircleOutlined, Clear } from '@mui/icons-material';
+import { AddCircleOutlined } from '@mui/icons-material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiDeleteClass, apiGetListClass } from 'apis/class';
+import { apiGetListClass, apiRemoveClass } from 'apis/class';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -10,7 +11,7 @@ import Swal from 'sweetalert2';
 const Class = () => {
   const actionButton = (params) => (
     <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
-      <Clear />
+      <DeleteIcon />
     </Button>
   );
 
@@ -24,8 +25,8 @@ const Class = () => {
       field: 'class_name',
       headerName: 'Class Name',
       width: 300,
-      valueGetter: params => {
-        return `${params?.row?.class_name} ${params?.row?.class_code}`
+      valueGetter: (params) => {
+        return `${params?.row?.class_name} ${params?.row?.class_code}`;
       }
     },
     {
@@ -34,7 +35,7 @@ const Class = () => {
       width: 140,
       valueGetter: (params) => {
         const isDisplay = params.row.display;
-  
+
         return isDisplay ? 'Mở' : 'Đóng';
       }
     },
@@ -72,9 +73,9 @@ const Class = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await apiDeleteClass(id);
+          await apiRemoveClass(id);
 
-          Swal.fire('Deleted!', 'The class has been deleted.', 'success');
+          Swal.fire('Deleted!', 'The class has been removed.', 'success');
           fetchClass();
         } catch (error) {
           Swal.fire('Fail!', 'Delete fail', 'error');
@@ -83,13 +84,16 @@ const Class = () => {
     });
   };
   const [classes, setClasses] = useState([]);
+  console.log('classes: ', classes);
 
   document.title = 'Lớp học';
 
   const fetchClass = async () => {
     try {
       const response = await apiGetListClass();
-      setClasses(response?.data);
+      const filteredClasses = response?.data?.filter((cl) => !cl.delete);
+      setClasses(filteredClasses);
+      // setClasses(response?.data);
     } catch (error) {
       console.log('Failed to fetch class list: ', error);
     }
@@ -105,15 +109,20 @@ const Class = () => {
           Danh sách lớp học
         </Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<AddCircleOutlined />}
-          LinkComponent={Link}
-          to={Path.ClassAdd}
-          className="bg-primary hover:bg-hover"
-        >
-          Thêm lớp học
-        </Button>
+        <div className="flex gap-2">
+          <Button LinkComponent={Link} to={Path.ClassDeleted} variant="contained" className="bg-primary hover:bg-hover" >
+            <DeleteIcon />
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlined />}
+            LinkComponent={Link}
+            to={Path.ClassAdd}
+            className="bg-primary hover:bg-hover"
+          >
+            Thêm lớp học
+          </Button>
+        </div>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid

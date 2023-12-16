@@ -49,6 +49,18 @@ export const apiGetCourseById = async (id) => {
   }
 };
 
+export const apiRemoveCourse = async (id) => {
+  try {
+    return instance({
+      method: 'PUT',
+      url: `/api/course/remove-course/${id}`
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 export const apiDeleteCourse = async (id) => {
   try {
     return instance({

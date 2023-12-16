@@ -1,7 +1,8 @@
-import { AddCircleOutlined, Clear, EditOutlined } from '@mui/icons-material';
+import { AddCircleOutlined, EditOutlined } from '@mui/icons-material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiDeleteCourse, apiGetListCourse } from 'apis/course';
+import { apiGetListCourse, apiRemoveCourse } from 'apis/course';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -14,7 +15,7 @@ const Course = () => {
         <EditOutlined />
       </Button>
       <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
-        <Clear />
+        <DeleteIcon />
       </Button>
     </div>
   );
@@ -58,7 +59,7 @@ const Course = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await apiDeleteCourse(id);
+          await apiRemoveCourse(id);
 
           Swal.fire('Deleted!', 'The course has been deleted.', 'success');
           fetchCourse();
@@ -69,13 +70,15 @@ const Course = () => {
     });
   };
   const [courses, setCourse] = useState([]);
+  console.log('courses: ', courses);
 
   document.title = 'Khóa học';
 
   const fetchCourse = async () => {
     try {
       const response = await apiGetListCourse();
-      setCourse(response?.data);
+      const filteredCourses = response.data.filter((cl) => !cl.delete);
+      setCourse(filteredCourses);
     } catch (error) {
       console.log('Failed to fetch user list: ', error);
     }
@@ -91,15 +94,20 @@ const Course = () => {
           Danh sách khóa học
         </Typography>
 
-        <Button
-          variant="contained"
-          startIcon={<AddCircleOutlined />}
-          LinkComponent={Link}
-          to={Path.CourseAdd}
-          className="bg-primary hover:bg-hover"
-        >
-          Thêm khóa học
-        </Button>
+        <div className="flex gap-2">
+          <Button LinkComponent={Link} to={Path.CourseDeleted} variant="contained" className="bg-primary hover:bg-hover">
+            <DeleteIcon />
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlined />}
+            LinkComponent={Link}
+            to={Path.CourseAdd}
+            className="bg-primary hover:bg-hover"
+          >
+            Thêm khóa học
+          </Button>
+        </div>
       </Box>
       <Box sx={{ height: 430, width: '100%' }}>
         <DataGrid

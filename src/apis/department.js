@@ -59,3 +59,15 @@ export const apiDeleteDepartment = async (id) => {
     console.log(error);
   }
 };
+
+
+export const apiRemoveDepartment = async (id) => {
+  try {
+    return instance({
+      method: 'PUT',
+      url: `/api/department/remove-department/${id}`
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

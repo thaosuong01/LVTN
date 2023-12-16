@@ -1,25 +1,17 @@
-import { AddCircleOutlined, Delete, EditOutlined } from '@mui/icons-material';
+import { AddCircleOutlined, Clear } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { apiGetListDepartment, apiRemoveDepartment } from 'apis/department';
+import { apiDeleteDepartment, apiGetListDepartment } from 'apis/department';
 import { Path } from 'constants/path';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const Department = () => {
+const DepartmentDeleted = () => {
   const actionButton = (params) => (
     <div className="flex gap-4">
-      <Button
-        LinkComponent={Link}
-        to={`${Path.DepartmentEdit}/${params.row._id}`}
-        variant="contained"
-        className="bg-primary hover:bg-hover"
-      >
-        <EditOutlined />
-      </Button>
       <Button onClick={() => handleDelete(params.row._id)} variant="contained" className="bg-primary hover:bg-hover">
-        <Delete />
+        <Clear />
       </Button>
     </div>
   );
@@ -53,7 +45,7 @@ const Department = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await apiRemoveDepartment(id);
+          await apiDeleteDepartment(id);
 
           Swal.fire('Deleted!', 'The course has been deleted.', 'success');
           fetchDepartment();
@@ -64,14 +56,13 @@ const Department = () => {
     });
   };
   const [departments, setDepartment] = useState([]);
-  console.log('departments: ', departments);
 
   document.title = 'Khoa';
 
   const fetchDepartment = async () => {
     try {
       const response = await apiGetListDepartment();
-      const filteredDepart = response?.data?.filter((depart) => !depart.delete);
+      const filteredDepart = response?.data?.filter((depart) => depart.delete);
       setDepartment(filteredDepart);
     } catch (error) {
       console.log('Failed to fetch department list: ', error);
@@ -89,17 +80,14 @@ const Department = () => {
         </Typography>
 
         <div className="flex gap-2">
-          <Button LinkComponent={Link} to={Path.DepartmentDeleted} variant="contained" className="bg-primary hover:bg-hover">
-            <Delete />
-          </Button>
           <Button
             variant="contained"
             startIcon={<AddCircleOutlined />}
             LinkComponent={Link}
-            to={Path.DepartmentAdd}
+            to={Path.Department}
             className="bg-primary hover:bg-hover"
           >
-            Thêm khoa
+            Danh sách khoa
           </Button>
         </div>
       </Box>
@@ -147,4 +135,4 @@ const Department = () => {
   );
 };
 
-export default Department;
+export default DepartmentDeleted;

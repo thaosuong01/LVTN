@@ -27,14 +27,17 @@ const RoleEdit = Loadable(lazy(() => import('pages/role/RoleEdit')));
 const Department = Loadable(lazy(() => import('pages/department/Department')));
 const DepartmentAdd = Loadable(lazy(() => import('pages/department/DepartmentAdd')));
 const DepartmentEdit = Loadable(lazy(() => import('pages/department/DepartmentEdit')));
+const DepartmentDeleted = Loadable(lazy(() => import('pages/department/DepartmentDeleted')));
 
 // render - course
 const Course = Loadable(lazy(() => import('pages/course/Course')));
 const CourseAdd = Loadable(lazy(() => import('pages/course/CourseAdd')));
 const CourseEdit = Loadable(lazy(() => import('pages/course/CourseEdit')));
+const CourseDeleted = Loadable(lazy(() => import('pages/course/CourseDeleted')));
 
 // render - class
 const Class = Loadable(lazy(() => import('pages/class/Class')));
+const ClassDeleted = Loadable(lazy(() => import('pages/class/ClassDeleted')));
 
 // render - document
 const Document = Loadable(lazy(() => import('pages/document/Document')));
@@ -113,6 +116,10 @@ const MainRoutes = {
           element: <DepartmentAdd />
         },
         {
+          path: Path.DepartmentDeleted,
+          element: <DepartmentDeleted />
+        },
+        {
           path: `${Path.DepartmentEdit}/:id`,
           element: <DepartmentEdit />
         }
@@ -130,6 +137,10 @@ const MainRoutes = {
           element: <CourseAdd />
         },
         {
+          path: Path.CourseDeleted,
+          element: <CourseDeleted />
+        },
+        {
           path: `${Path.CourseEdit}/:id`,
           element: <CourseEdit />
         }
@@ -141,6 +152,10 @@ const MainRoutes = {
         {
           index: true,
           element: <Class />
+        },
+        {
+          path: Path.ClassDeleted,
+          element: <ClassDeleted />
         }
       ]
     },

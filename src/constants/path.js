@@ -29,14 +29,17 @@ export const Path = {
   Course: '/course',
   CourseAdd: '/course/course-add',
   CourseEdit: '/course/course-edit',
+  CourseDeleted: '/course/course-deleted',
 
   // Class
   Class: '/class',
+  ClassDeleted: '/class/class-deleted',
 
   // Department
   Department: '/department',
   DepartmentAdd: '/department/department-add',
   DepartmentEdit: '/department/department-edit',
+  DepartmentDeleted: '/department/department-deleted',
 
   // Document
   Document: '/document'
